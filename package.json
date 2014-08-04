@@ -1,0 +1,45 @@
+{
+    "name": "slot-cli",
+    "version": "0.0.6",
+    "description": "Closing the gap between server and client side, Slot is a Cross Side Web Framework that let you reuse the same code on client and server side",
+    "keywords": [
+        "framework",
+        "web",
+        "development",
+        "slot",
+        "fragment",
+        "bootstrap",
+        "zurb",
+        "jquery", "html", "html5", "css"
+    ],
+    "author": {
+        "name": "Carlos Echeverría",
+        "email": "SlotFramework@gmail.com",
+        "url": "https://github.com/cecheverria"
+    },
+    "contributors": [],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/SlotTeam/slot-framework/blob/master/LICENSE"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/SlotTeam/slot-framework.git"
+    },
+    "dependencies":{
+        "mkdirp": "0.3.5",
+		"commander": ">=1.0.0",
+        "slot-framework": ">= 0.0.1"
+    },
+    "engines": {
+        "node": ">= 0.9.0",
+        "node": ">= 0.10.0"
+    },
+    "main": "index",
+    "homepage": "http://www.slotframework.org/",
+    "bin": {
+        "slot": "bin/slot-cli.js"
+    }
+}
