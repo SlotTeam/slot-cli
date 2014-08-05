@@ -1,0 +1,13 @@
+/**
+ * Bind page {@page-name@}.json for {@page-name@}.html
+ * Created using Slot Framework command line on {@page-creation-date@}
+ */
+
+{
+    "slots": {
+    },
+    "binds": {
+        "pageTitle":"{@pageTitle@}",
+        "welcomeMsg":"{@welcomeMsg@}"
+    }
+}

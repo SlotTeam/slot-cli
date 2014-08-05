@@ -1,0 +1,12 @@
+/**
+ * Bind fragment {@fragment-name@}.json for {@fragment-name@}.html
+ * Created using Slot Framework command line on {@fragment-creation-date@}
+ */
+
+{
+    "slots": {
+    },
+    "binds": {
+        "someAttribute":"Some attribute value"
+    }
+}
