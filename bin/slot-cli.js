@@ -15,10 +15,11 @@
 
 var program = require('commander'),
     fs = require("fs"),
-    path = require("path")
+    path = require("path"),
+    mkdirp = require('mkdirp')
     ;
 
-program.version('0.0.6');
+program.version('0.0.7');
 
 /*program
   .command('hi')
@@ -60,7 +61,7 @@ program
         if(project) {
             console.log('Creating [%s] poject!', project);
 
-            var mkdirp = require('mkdirp');
+            //var mkdirp = require('mkdirp');
 
                 mkdirp(project, function (err) {
                 if (err) console.error(err)
@@ -127,12 +128,14 @@ program
                                                                                 //
                                                                                 fs.writeFile(pathFile, content, function (err) {
                                                                                     if (err) throw err;
-                                                                                    console.log('Saved slot.json on: ' + pathFile);
+                                                                                    console.log('Saved package.json on: ' + pathFile);
 
                                                                                     /**
-                                                                                     * TODO: Execute 'npm install' to build all dependencies
+                                                                                     * Execute 'npm install' to build all dependencies
                                                                                      */
-                                                                                    //npmInstall(project);
+                                                                                    npmInstall(project);
+
+                                                                                    buildServes(pathToResources, project);
 
                                                                                     /**
                                                                                      * Build project home page
@@ -174,6 +177,30 @@ program
     });
 
 program
+    .command('start')
+    .description('Start designer and development servers on current slot project')
+    .action(function(options){
+        //console.log('Adding options %s %s', options.fragment, options.rest);
+
+        /**
+         * TODO: validate if current folder contains a node.js module structure
+         */
+
+        /*var pathToResources = path.join(path.join(__dirname, ".."), "resources");
+
+        if(options.fragment) {
+            addFragment(pathToResources, process.cwd(), options.fragment);
+        }*/
+        var designer = require('../lib/designServer'),
+            development = require('../lib/developmentServer')
+        ;
+
+        designer.start();
+        //development.start();
+    }
+);
+
+program
     .command('add')
     .description('Add a new object to current slot project')
     .option("-p, --page [page]", "Which page name to use", null)
@@ -211,7 +238,7 @@ program.parse(process.argv);
  */
 var exec = require('child_process').exec;
 
-var run = function(cmd){
+var run = function(cmd, callback) {
     var child = exec(cmd, function (error, stdout, stderr) {
         if (stderr !== null) {
             console.log('' + stderr);
@@ -222,22 +249,29 @@ var run = function(cmd){
         if (error !== null) {
             console.log('' + error);
         }
+
+        //callback();
     });
 };
 
 function npmInstall(project) {
 
     if(project.trim()!='') {
-        var folder = path.join(process.cwd(), project);
+
+        var current = process.cwd(),
+            folder = path.join(process.cwd(), project);
 
         console.log('Installing new project [%s]', folder);
+        process.chdir(folder);
 
         /**
-         * TODO: Add code to execute npmInstall..
+         * Execute npm install for all dependencies..
          */
-        run(/*'cd ' + folder + '; ' +*/ 'npm install');
+        run('npm install' /*, function() {
+        }*/);
 
         console.log('Project [%s] installed on [%s]', project, folder);
+        process.chdir(current);
     }
     else {
         console.log('Please enter a valid project name');
@@ -275,6 +309,28 @@ function buildResource(source, destiny, attrs, values) {
     });*/
     fs.writeFileSync(pathFile, content);
     console.log('Saved resource on: %s', pathFile);
+}
+
+function buildServes(pathToResources, projectFolder) {
+
+    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
+
+    mkdirp(path.join(projectFolder, "server"), function (err) {
+        if (err) console.error(err)
+        else {
+            console.log('Creating servers..');
+
+            buildResource(path.join(pathToResources, "ref-designerServer.js")
+                , path.join(path.join(projectFolder, "server"), "designer.js")
+                , ["page-creation-date"]
+                , [nowTimeStamp]);
+
+            buildResource(path.join(pathToResources, "ref-developerServer.js")
+                , path.join(path.join(projectFolder, "server"), "developer.js")
+                , ["page-creation-date"]
+                , [nowTimeStamp]);
+        }
+    });
 }
 
 function buildPage(pathToResources, projectFolder, page, isHomePage) {
