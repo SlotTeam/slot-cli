@@ -1,6 +1,6 @@
 {
     "name": "slot-cli",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "Command line, a friendly tool for easy handle Slot Framework projects (manage projects, fragments and REST services)",
     "keywords": [
         "framework",
