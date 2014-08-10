@@ -400,12 +400,42 @@ function addRestService(pathToResources, projectFolder, rest) {
     }
 }
 
+/**
+ *
+ * @param pathToResources   The full path were the slot-cli/resources folder has been created
+ * @param projectFolder     The full path were the project folder has been created
+ * @param page              The page name
+ */
 function addPage(pathToResources, projectFolder, page) {
 
     if(page.trim()!='') {
         console.log('Adding new page [%s]', page);
 
-        buildPage(pathToResources, projectFolder, page);
+        /**
+         * TODO:
+         *  1.  Validate if exists the full-path folder where the file will be created,
+         *      then continue whit the buildPage() function
+         */
+
+        var folder = page.split('/').pop(); // Using '/' because we are talking about web contexts
+
+        console.log('Adding new page name [%s]', folder);
+
+        folder = page.replace(folder, '');
+
+        console.log('Adding new page [%s] on [%s]', page, folder);
+        //
+        mkdirp(path.join(projectFolder, path.join("www", folder)), function (err) {
+            if (err) console.error(err)
+            else {
+                mkdirp(path.join(projectFolder, path.join("bind", folder)), function (err) {
+                    if (err) console.error(err)
+                    else {
+                        buildPage(pathToResources, projectFolder, page);
+                    }
+                });
+            }
+        });
 
         console.log('Page [%s] created on [%s]', page, 'todo_path');
     }
