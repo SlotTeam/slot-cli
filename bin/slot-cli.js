@@ -14,6 +14,7 @@
  */
 
 var program = require('commander'),
+    os = require("os"),
     fs = require("fs"),
     path = require("path"),
     mkdirp = require('mkdirp')
@@ -91,11 +92,11 @@ program
                                                     mkdirp(path.join(project, "/app/db"), function (err) {
                                                         if (err) console.error(err)
                                                         else {
-                                                            console.log('creating restFilter folder');
+                                                            /*console.log('creating restFilter folder');
 
                                                             mkdirp(path.join(project, "/rest"), function (err) {
                                                                 if (err) console.error(err)
-                                                                else {
+                                                                else {*/
                                                                     console.log('creating mvcFilter folder');
 
                                                                     mkdirp(path.join(project, "/mvc"), function (err) {
@@ -157,8 +158,8 @@ program
                                                                         }
                                                                     });
                                                                 }
-                                                            });
-                                                        }
+                                                            //});
+                                                        //}
                                                     });
                                                 }
                                             });
@@ -333,22 +334,26 @@ function buildServes(pathToResources, projectFolder) {
     });
 }
 
+function buildRestService(pathToResources, projectFolder, page, isHomePage) {
+
+    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString()
+        //pageType = isHomePage ? " home page " : " page ",
+        //pageType = isHomePage ? projectFolder+pageType : page+pageType
+        ;
+
+    buildResource(path.join(pathToResources, "ref-rest-service.js")
+        , path.join(path.join(projectFolder, "app/rest"), page+".js")
+        , ["rest-name", "rest-url", "pc-machine", "creation-date"]
+        , [page, "http://<server>:<port>/rest/"+page, os.hostname, nowTimeStamp]);
+
+}
+
 function buildPage(pathToResources, projectFolder, page, isHomePage) {
 
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
         pageType = isHomePage ? " home page " : " page ",
         pageType = isHomePage ? projectFolder+pageType : page+pageType
         ;
-
-    /*buildResource(path.join(pathToResources, "ref-fragment-bind.json")
-     , path.join(path.join(project, "bind"), "index.json")
-     , ["fragment-name", "fragment-creation-date"]
-     , ["index", nowTimeStamp]);
-
-     buildResource(path.join(pathToResources, "ref-fragment.html")
-     , path.join(path.join(project, "www"), "index.html")
-     , ["fragment-name", "fragment-creation-date"]
-     , ["index", nowTimeStamp]);*/
 
     buildResource(path.join(pathToResources, "ref-page-bind.json")
         , path.join(path.join(projectFolder, "bind"), page+".json")
@@ -390,9 +395,24 @@ function addRestService(pathToResources, projectFolder, rest) {
         /**
          * TODO: Add code to build a new rest service..
          */
-        cmdUnderConstruction();
+        //cmdUnderConstruction();
 
-        //console.log('Rest service [%s] created on [%s]', rest, 'todo_path');
+        var folder = rest.split('/').pop(); // Using '/' because we are talking about web contexts
+
+        console.log('Adding new rest name [%s]', folder);
+
+        folder = rest.replace(folder, '');
+
+        console.log('Adding new rest [%s] on [%s]', rest, folder);
+        //
+        mkdirp(path.join(projectFolder, path.join("app/rest", folder)), function (err) {
+            if (err) console.error(err)
+            else {
+                buildRestService(pathToResources, projectFolder, rest);
+            }
+        });
+
+        console.log('Rest service [%s] created on [%s]', rest, 'todo_path');
     }
     else {
         console.log('Please enter a valid rest service name');
