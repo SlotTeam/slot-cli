@@ -20,7 +20,7 @@ var program = require('commander'),
     mkdirp = require('mkdirp')
     ;
 
-program.version('0.0.7');
+program.version('0.0.10');
 
 /*program
   .command('hi')
@@ -179,7 +179,11 @@ program
 
 program
     .command('start')
-    .description('Start designer and development servers on current slot project')
+    .description('Start servers on current slot project, without parameters, it starts the designer server by default')
+    //.option("-p, --port [port]", "specify the port [3000]", /*Number,*/ 3000)
+    .option("-s, --design", "Start the designer server on current slot project")
+    .option("-d, --develop", "Start the development server on current slot project")
+    .option("-a, --all", "Start designer and development server on current slot project")
     .action(function(options){
         //console.log('Adding options %s %s', options.fragment, options.rest);
 
@@ -187,17 +191,27 @@ program
          * TODO: validate if current folder contains a node.js module structure
          */
 
-        /*var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-
-        if(options.fragment) {
-            addFragment(pathToResources, process.cwd(), options.fragment);
-        }*/
         var designer = require('../lib/designServer'),
             development = require('../lib/developmentServer')
-        ;
+            ;
 
-        designer.start();
-        //development.start();
+        if(options.develop) {
+            development.start();
+        }
+        else if(options.all) {
+            cmdUnderConstruction()
+        }
+        else if(options.port) {
+            cmdUnderConstruction()
+        }
+        else if(options.design || (!options.develop && !options.design && !options.all && !options.port)) {
+            designer.start();
+        }
+        else {
+            //console.log(options);
+            console.log('Please enter a valid option');
+            console.log('   To see help use: slot start -h');
+        }
     }
 );
 
@@ -286,6 +300,7 @@ function cmdUnderConstruction() {
     console.log(' * working hard to release as soon as possible.. :-) * ');
     console.log();
 }
+
 function buildResource(source, destiny, attrs, values) {
     /**
      * Load content
@@ -334,18 +349,14 @@ function buildServes(pathToResources, projectFolder) {
     });
 }
 
-function buildRestService(pathToResources, projectFolder, page, isHomePage) {
+function buildRestService(pathToResources, projectFolder, rest, isHomePage) {
 
-    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString()
-        //pageType = isHomePage ? " home page " : " page ",
-        //pageType = isHomePage ? projectFolder+pageType : page+pageType
-        ;
+    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
 
     buildResource(path.join(pathToResources, "ref-rest-service.js")
-        , path.join(path.join(projectFolder, "app/rest"), page+".js")
+        , path.join(path.join(projectFolder, "app/rest"), rest+".js")
         , ["rest-name", "rest-url", "pc-machine", "creation-date"]
-        , [page, "http://<server>:<port>/rest/"+page, os.hostname, nowTimeStamp]);
-
+        , [rest.split('/').pop(), "http://<server>:<port>/rest/"+rest, os.hostname, nowTimeStamp]);
 }
 
 function buildPage(pathToResources, projectFolder, page, isHomePage) {
@@ -387,15 +398,22 @@ function addFragment(pathToResources, projectFolder, fragment) {
     }
 }
 
+/**
+ *
+ * @param pathToResources   The full path were the slot-cli/resources folder has been created
+ * @param projectFolder     The full path were the project folder has been created
+ * @param rest              The rest service name
+ */
 function addRestService(pathToResources, projectFolder, rest) {
 
     if(rest.trim()!='') {
         console.log('Adding new rest service [%s]', rest);
 
         /**
-         * TODO: Add code to build a new rest service..
+         * TODO:
+         *  1.  Validate if exists the full-path folder where the file will be created,
+         *      then continue whit the buildRestService() function
          */
-        //cmdUnderConstruction();
 
         var folder = rest.split('/').pop(); // Using '/' because we are talking about web contexts
 

@@ -1,17 +1,17 @@
 /**
- * Rest service {@rest-name@}, to consume use the URL:
+ * Rest service '{@rest-name@}', to consume use the URL:
  *
  *  {@rest-url@}
  *
- * Created using Slot Command Line by {@pc-machine@} on {@creation-date@}.
+ * Created using Slot Command Line by {@pc-machine@} on {@creation-date@}
  */
 
 var Slot = require('slot-framework');
 
 /**
- * Function run must be used to implements your REST Service logic,then when
- * you are ready, you must execute the function callback. The function
- * callback is passed as a parameter when the mainController invoke the
+ * Function run must be used to implement your REST Service logic,then when
+ * you are ready, you must execute the callback function. The callback
+ * function is passed as a parameter when the mainController invoke the
  * run(callback) method, and you need to pass the data content to be
  * rendered.
  */
@@ -51,7 +51,7 @@ function run(request,
     /**
      * Call the callback function when your data have been filled.
      */
-    callback(data /*<<== "data to be saved on memory"*/);
+    callback(data /*<<== "data buffer to be saved on session"*/);
 }
 
 module.exports.run = run;
