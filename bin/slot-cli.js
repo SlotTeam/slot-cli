@@ -248,6 +248,42 @@ program
     }
 );
 
+
+program
+    .command('export *')
+    .description('Export current slot project into optimized format, a zip file will be created with just necesary objects to deploy on Production Server')
+    .option("-m, --minify [minify]", "Minify 'html, css, js' files on current slot project"/*, null*/ /*,"ALL"*/)
+    .action(function(options){
+        //console.log(options);
+        console.log('Export options %s', options.minify);
+
+        if(options.minify) {
+
+            /**
+             * TODO:
+             *  1.  Validate if(options.minify.trim()!='') when calling buildExport()
+             */
+
+            console.log('Exporting and minify current project.. %s', options.minify==true);
+
+            //slot export -m 'css,html'
+
+            // Set to ALL extensions, if '-m' option don't have values
+            var extensions = options.minify == true ? "html,css,js".split(',') : options.minify.split(',');
+
+            console.log('Exporting and minify current project, extensions %s', extensions);
+
+            cmdUnderConstruction();
+        }
+        else {
+            console.log('Exporting current project..');
+            cmdUnderConstruction();
+        }
+    }
+);
+
+
+
 program.parse(process.argv);
 
 /**
