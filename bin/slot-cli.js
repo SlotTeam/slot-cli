@@ -20,7 +20,7 @@ var program = require('commander'),
     mkdirp = require('mkdirp')
     ;
 
-program.version('0.0.10');
+program.version('0.0.11');
 
 /*program
   .command('hi')
@@ -97,11 +97,11 @@ program
                                                             mkdirp(path.join(project, "/rest"), function (err) {
                                                                 if (err) console.error(err)
                                                                 else {*/
-                                                                    console.log('creating mvcFilter folder');
+                                                                    /*console.log('creating mvcFilter folder');
 
                                                                     mkdirp(path.join(project, "/mvc"), function (err) {
                                                                         if (err) console.error(err)
-                                                                        else {
+                                                                        else {*/
                                                                             console.log('Running on  ' + __dirname);
 
                                                                             var pathToResources = path.join(path.join(__dirname, ".."), "resources");
@@ -155,11 +155,11 @@ program
                                                                                      */
                                                                                 });
                                                                             });
-                                                                        }
-                                                                    });
-                                                                }
+                                                                        /*}
+                                                                    });*/
+                                                                //}
                                                             //});
-                                                        //}
+                                                        }
                                                     });
                                                 }
                                             });
@@ -209,7 +209,7 @@ program
         }
         else {
             //console.log(options);
-            console.log('Please enter a valid option');
+            console.log('Please enter a valid command');
             console.log('   To see help use: slot start -h');
         }
     }
@@ -230,6 +230,8 @@ program
 
         var pathToResources = path.join(path.join(__dirname, ".."), "resources");
 
+        //console.log('Options [%s] [%s] [%s]', options.fragment, options.rest, options.page);
+
         if(options.fragment) {
             addFragment(pathToResources, process.cwd(), options.fragment);
         }
@@ -240,7 +242,7 @@ program
             addPage(pathToResources, process.cwd(), options.page);
         }
         else {
-            console.log('Please enter a valid option');
+            console.log('Please enter a valid command');
             console.log('   To see help use: slot add -h');
         }
     }
@@ -349,16 +351,6 @@ function buildServes(pathToResources, projectFolder) {
     });
 }
 
-function buildRestService(pathToResources, projectFolder, rest, isHomePage) {
-
-    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
-
-    buildResource(path.join(pathToResources, "ref-rest-service.js")
-        , path.join(path.join(projectFolder, "app/rest"), rest+".js")
-        , ["rest-name", "rest-url", "pc-machine", "creation-date"]
-        , [rest.split('/').pop(), "http://<server>:<port>/rest/"+rest, os.hostname, nowTimeStamp]);
-}
-
 function buildPage(pathToResources, projectFolder, page, isHomePage) {
 
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
@@ -371,71 +363,39 @@ function buildPage(pathToResources, projectFolder, page, isHomePage) {
         , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
         //, [page, nowTimeStamp, projectFolder+pageType, "Welcome to "+projectFolder+pageType]
         , [page, nowTimeStamp, pageType, "Welcome to "+pageType]
-        );
+    );
 
     buildResource(path.join(pathToResources, "ref-page.html")
         , path.join(path.join(projectFolder, "www"), page+".html")
         , ["page-name", "page-creation-date"]
         , [page, nowTimeStamp]);
-
 }
 
-function addFragment(pathToResources, projectFolder, fragment) {
+function buildFragment(pathToResources, projectFolder, fragment) {
 
-    if(fragment.trim()!='') {
-        console.log('Adding new fragment [%s]', fragment);
+    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
+        prefixedName = fragment.split('/').pop();
 
-        /**
-         * TODO: Add code to build a new fragment..
-         */
-        cmdUnderConstruction();
+    buildResource(path.join(pathToResources, "ref-fragment-bind.json")
+        , path.join(path.join(projectFolder, "bind"), fragment+".json")
+        , ["fragmentID"]
+        , [ 'frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1)) ]
+    );
 
-        //console.log('Fragment [%s] created on [%s]', fragment, 'todo_path');
-    }
-    else {
-        console.log('Please enter a valid fragment name');
-        console.log('   To see help use: slot add -h');
-    }
+    buildResource(path.join(pathToResources, "ref-fragment.html")
+        , path.join(path.join(projectFolder, "www"), fragment+".html")
+        , ["fragment-name", "fragment-creation-date"]
+        , [fragment, nowTimeStamp]);
 }
 
-/**
- *
- * @param pathToResources   The full path were the slot-cli/resources folder has been created
- * @param projectFolder     The full path were the project folder has been created
- * @param rest              The rest service name
- */
-function addRestService(pathToResources, projectFolder, rest) {
+function buildRestService(pathToResources, projectFolder, rest) {
 
-    if(rest.trim()!='') {
-        console.log('Adding new rest service [%s]', rest);
+    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
 
-        /**
-         * TODO:
-         *  1.  Validate if exists the full-path folder where the file will be created,
-         *      then continue whit the buildRestService() function
-         */
-
-        var folder = rest.split('/').pop(); // Using '/' because we are talking about web contexts
-
-        console.log('Adding new rest name [%s]', folder);
-
-        folder = rest.replace(folder, '');
-
-        console.log('Adding new rest [%s] on [%s]', rest, folder);
-        //
-        mkdirp(path.join(projectFolder, path.join("app/rest", folder)), function (err) {
-            if (err) console.error(err)
-            else {
-                buildRestService(pathToResources, projectFolder, rest);
-            }
-        });
-
-        console.log('Rest service [%s] created on [%s]', rest, 'todo_path');
-    }
-    else {
-        console.log('Please enter a valid rest service name');
-        console.log('   To see help use: slot add -h');
-    }
+    buildResource(path.join(pathToResources, "ref-rest-service.js")
+        , path.join(path.join(projectFolder, "app/rest"), rest+".js")
+        , ["rest-name", "rest-url", "pc-machine", "creation-date"]
+        , [rest.split('/').pop(), "http://<server>:<port>/rest/"+rest, os.hostname, nowTimeStamp]);
 }
 
 /**
@@ -450,11 +410,9 @@ function addPage(pathToResources, projectFolder, page) {
         console.log('Adding new page [%s]', page);
 
         /**
-         * TODO:
-         *  1.  Validate if exists the full-path folder where the file will be created,
-         *      then continue whit the buildPage() function
+         * Validate if exists the full-path folder where the file will be created,
+         * then continue whit the buildPage() function
          */
-
         var folder = page.split('/').pop(); // Using '/' because we are talking about web contexts
 
         console.log('Adding new page name [%s]', folder);
@@ -479,6 +437,85 @@ function addPage(pathToResources, projectFolder, page) {
     }
     else {
         console.log('Please enter a valid page name');
+        console.log('   To see help use: slot add -h');
+    }
+}
+
+function addFragment(pathToResources, projectFolder, fragment) {
+
+    if(fragment.trim()!='') {
+        console.log('Adding new fragment [%s]', fragment);
+
+        /**
+         * Validate if exists the full-path folder where the file will be created,
+         * then continue whit the buildFragment() function
+         */
+        var folder = fragment.split('/').pop(); // Using '/' because we are talking about web contexts
+
+        var fileName = 'frg' + (folder.charAt(0).toUpperCase() + folder.slice(1));
+        fragment = fragment.replace(folder, fileName);
+        folder = fileName;
+
+        console.log('Adding new fragment name [%s]', folder);
+
+        folder = fragment.replace(folder, '');
+
+        console.log('Adding new fragment [%s] on [%s]', fragment, folder);
+        //
+        mkdirp(path.join(projectFolder, path.join("www", folder)), function (err) {
+            if (err) console.error(err)
+            else {
+                mkdirp(path.join(projectFolder, path.join("bind", folder)), function (err) {
+                    if (err) console.error(err)
+                    else {
+                        buildFragment(pathToResources, projectFolder, fragment);
+                    }
+                });
+            }
+        });
+
+        console.log('Fragment [%s] created on [%s]', fragment, 'todo_path');
+    }
+    else {
+        console.log('Please enter a valid fragment name');
+        console.log('   To see help use: slot add -h');
+    }
+}
+
+/**
+ *
+ * @param pathToResources   The full path were the slot-cli/resources folder has been created
+ * @param projectFolder     The full path were the project folder has been created
+ * @param rest              The rest service name
+ */
+function addRestService(pathToResources, projectFolder, rest) {
+
+    if(rest.trim()!='') {
+        console.log('Adding new rest service [%s]', rest);
+
+        /**
+         * Validate if exists the full-path folder where the file will be created,
+         * then continue whit the buildRestService() function
+         */
+        var folder = rest.split('/').pop(); // Using '/' because we are talking about web contexts
+
+        console.log('Adding new rest name [%s]', folder);
+
+        folder = rest.replace(folder, '');
+
+        console.log('Adding new rest [%s] on [%s]', rest, folder);
+        //
+        mkdirp(path.join(projectFolder, path.join("app/rest", folder)), function (err) {
+            if (err) console.error(err)
+            else {
+                buildRestService(pathToResources, projectFolder, rest);
+            }
+        });
+
+        console.log('Rest service [%s] created on [%s]', rest, 'todo_path');
+    }
+    else {
+        console.log('Please enter a valid rest service name');
         console.log('   To see help use: slot add -h');
     }
 }

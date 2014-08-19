@@ -2,6 +2,7 @@
     "slots": {
     },
     "binds": {
+        "fragmentID":"{@fragmentID@}",
         "someAttribute":"Some attribute value"
     }
 }
