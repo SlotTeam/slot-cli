@@ -186,13 +186,14 @@ program
     .option("-a, --all", "Start designer and development server on current slot project")
     .action(function(options){
         //console.log('Adding options %s %s', options.fragment, options.rest);
+        //console.log('Starting on [%s]', process.cwd());
 
         /**
          * TODO: validate if current folder contains a node.js module structure
          */
 
-        var designer = require('../lib/designServer'),
-            development = require('../lib/developmentServer')
+        var development = require('slot-framework'),
+            designer = development.Designer
             ;
 
         if(options.develop) {
