@@ -1,7 +1,10 @@
-slot-cli
-========
+[![NPM version](https://badge.fury.io/js/slot-cli.svg)](http://badge.fury.io/js/slot-cli)
+[![GitHub version](https://badge.fury.io/gh/SlotTeam%2Fslot-cli.svg)](http://badge.fury.io/gh/SlotTeam%2Fslot-cli)
 
-Command line, a friendly tool for easy handle Slot Framework projects (manage projects, fragments and REST services).
+# [Slot Command Line Interface](http://www.SlotFramework.org/docs)
+
+> The official Slot CLI, a friendly tool for easy handle Slot Framework projects (manage projects, fragments, REST services and Html5 Themes), 
+ see more at [Slot CLI Docs](http://www.SlotFramework.org/docs).
 
 
 slot -h
@@ -23,10 +26,10 @@ slot -h
            Add a new object to current slot project
 
 
-  Options:
-
-    -h, --help     output usage information
-    -V, --version  output the version number
+        Options:
+        
+        -h, --help     output usage information
+        -V, --version  output the version number
 
 
 
