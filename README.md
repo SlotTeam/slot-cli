@@ -40,6 +40,7 @@ slot create -h
     
       Options:
     
+        -t, --theme [theme]          Which theme_id to use
         -h, --help  output usage information
 
 
