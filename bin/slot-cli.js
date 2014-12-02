@@ -17,10 +17,11 @@ var program = require('commander'),
     os = require("os"),
     fs = require("fs"),
     path = require("path"),
-    mkdirp = require('mkdirp')
+    mkdirp = require('mkdirp'),
+    pkg = require('../package.json');
     ;
 
-program.version('0.0.11');
+program.version(/*'0.0.12'*/ pkg.version);
 
 /*program
   .command('hi')
@@ -60,7 +61,7 @@ program
 
     .action(function(project){
         if(project) {
-            console.log('Creating [%s] poject!', project);
+            console.log('Creating [%s] project!', project);
 
             //var mkdirp = require('mkdirp');
 
