@@ -21,7 +21,7 @@ var program = require('commander'),
     pkg = require('../package.json');
     ;
 
-program.version(/*'0.0.12'*/ pkg.version);
+program.version(pkg.version);
 
 /*program
   .command('hi')
@@ -63,9 +63,7 @@ program
         if(project) {
             console.log('Creating [%s] project!', project);
 
-            //var mkdirp = require('mkdirp');
-
-                mkdirp(project, function (err) {
+            mkdirp(project, function (err) {
                 if (err) console.error(err)
                 else {
                     console.log('creating metaData folder');
@@ -93,73 +91,60 @@ program
                                                     mkdirp(path.join(project, "/app/db"), function (err) {
                                                         if (err) console.error(err)
                                                         else {
-                                                            /*console.log('creating restFilter folder');
+                                                            /*console.log('creating restFilter folder');*/
+                                                            console.log('Running on  ' + __dirname);
 
-                                                            mkdirp(path.join(project, "/rest"), function (err) {
-                                                                if (err) console.error(err)
-                                                                else {*/
-                                                                    /*console.log('creating mvcFilter folder');
+                                                            var pathToResources = path.join(path.join(__dirname, ".."), "resources");
+                                                            console.log('Resources folder ' + pathToResources);
 
-                                                                    mkdirp(path.join(project, "/mvc"), function (err) {
-                                                                        if (err) console.error(err)
-                                                                        else {*/
-                                                                            console.log('Running on  ' + __dirname);
+                                                            /**
+                                                             * Create slot.json file
+                                                             */
+                                                            var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"),'binary'),
+                                                                pathFile = path.join(project, "slot.json");
+                                                            //
+                                                            fs.writeFile(pathFile, content, function (err) {
+                                                                if (err) throw err;
+                                                                console.log('Saved slot.json on: ' + pathFile);
 
-                                                                            var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-                                                                            console.log('Resources folder ' + pathToResources);
+                                                                /**
+                                                                 * Create package.json file
+                                                                 */
+                                                                content = fs.readFileSync(path.join(pathToResources, "ref-package.json"),'binary'),
+                                                                pathFile = path.join(project, "package.json");
+                                                                //
+                                                                content = content
+                                                                    .replace("{@name@}",  project)
+                                                                    .replace("{@license@}",  "MIT");
+                                                                //
+                                                                fs.writeFile(pathFile, content, function (err) {
+                                                                    if (err) throw err;
+                                                                    console.log('Saved package.json on: ' + pathFile);
 
-                                                                            /**
-                                                                             * Create slot.json file
-                                                                             */
-                                                                            var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"),'binary'),
-                                                                                pathFile = path.join(project, "slot.json");
-                                                                            //
-                                                                            fs.writeFile(pathFile, content, function (err) {
-                                                                                if (err) throw err;
-                                                                                console.log('Saved slot.json on: ' + pathFile);
+                                                                    /**
+                                                                     * Execute 'npm install' to build all dependencies
+                                                                     */
+                                                                    npmInstall(project);
 
-                                                                                /**
-                                                                                 * Create package.json file
-                                                                                 */
-                                                                                content = fs.readFileSync(path.join(pathToResources, "ref-package.json"),'binary'),
-                                                                                pathFile = path.join(project, "package.json");
-                                                                                //
-                                                                                content = content
-                                                                                    .replace("{@name@}",  project)
-                                                                                    .replace("{@license@}",  "MIT");
-                                                                                //
-                                                                                fs.writeFile(pathFile, content, function (err) {
-                                                                                    if (err) throw err;
-                                                                                    console.log('Saved package.json on: ' + pathFile);
+                                                                    buildServes(pathToResources, project);
 
-                                                                                    /**
-                                                                                     * Execute 'npm install' to build all dependencies
-                                                                                     */
-                                                                                    npmInstall(project);
+                                                                    /**
+                                                                     * Build project home page
+                                                                     */
+                                                                    buildPage(pathToResources, project, "index", true /*<<== isHomepage*/);
 
-                                                                                    buildServes(pathToResources, project);
-
-                                                                                    /**
-                                                                                     * Build project home page
-                                                                                     */
-                                                                                    buildPage(pathToResources, project, "index", true /*<<== isHomepage*/);
-
-                                                                                    /**
-                                                                                     * TODO:
-                                                                                     *  1.  After creation show a message saying:
-                                                                                     *      This project have been created with OneTheme, the oficial Bootstrap
-                                                                                     *      custom theme for Slot Framework. You can see full show case of OneTheme
-                                                                                     *      in:
-                                                                                     *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
-                                                                                     *
-                                                                                     *      Or describe any other theme the user has selected
-                                                                                     */
-                                                                                });
-                                                                            });
-                                                                        /*}
-                                                                    });*/
-                                                                //}
-                                                            //});
+                                                                    /**
+                                                                     * TODO:
+                                                                     *  1.  After creation show a message saying:
+                                                                     *      This project have been created with OneTheme, the oficial Bootstrap
+                                                                     *      custom theme for Slot Framework. You can see full show case of OneTheme
+                                                                     *      in:
+                                                                     *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
+                                                                     *
+                                                                     *      Or describe any other theme the user has selected
+                                                                     */
+                                                                });
+                                                            });
                                                         }
                                                     });
                                                 }
@@ -170,7 +155,6 @@ program
                             });
                         }
                     });
-
                 }
             });
         }
@@ -341,24 +325,29 @@ function cmdUnderConstruction() {
     console.log();
 }
 
+/**
+ * Creates a resource (images, html, jsonFile, etc) on filesystem, then performs
+ * a variable substitution finding the expressions on "attrs" array and replacing
+ * a corresponding value from "values" array.
+ *
+ * @param source
+ * @param destiny
+ * @param attrs
+ * @param values
+ */
 function buildResource(source, destiny, attrs, values) {
-    /**
-     * Load content
-     */
+
+    // Load content
     var content = fs.readFileSync(source,'binary'),
         pathFile = destiny;
 
-    /**
-     * Substitute attributes and values
-     */
+    // Substitute attributes and values
     for(var index in attrs){
         console.log('Attr [%s] [%s]', attrs[index], values[index]);
         content = content.replace(RegExp("{@" + attrs[index] + "@}","g"),  values[index]);
     }
 
-    /**
-     * Write content on file
-     */
+    // Write content on file
     /*fs.writeFile(pathFile, content, function (err) {
         if (err) throw err;
         console.log('Saved resource on: %s', pathFile);
@@ -396,13 +385,14 @@ function buildPage(pathToResources, projectFolder, page, isHomePage) {
         pageType = isHomePage ? projectFolder+pageType : page+pageType
         ;
 
+    // Create JSON bind file
     buildResource(path.join(pathToResources, "ref-page-bind.json")
         , path.join(path.join(projectFolder, "bind"), page+".json")
         , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
-        //, [page, nowTimeStamp, projectFolder+pageType, "Welcome to "+projectFolder+pageType]
         , [page, nowTimeStamp, pageType, "Welcome to "+pageType]
     );
 
+    // Create HTML file
     buildResource(path.join(pathToResources, "ref-page.html")
         , path.join(path.join(projectFolder, "www"), page+".html")
         , ["page-name", "page-creation-date"]
