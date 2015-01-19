@@ -9,7 +9,7 @@
         "mvcFilter":    "/mvc"
     },
     "fragments": {
-        {@fragments@}
+
     },
     "logger": {
         "logFile":  "logs/slot.log",

@@ -18,6 +18,7 @@ var program = require('commander'),
     fs = require("fs"),
     path = require("path"),
     mkdirp = require('mkdirp'),
+    slotJson = require('../slot.json'),
     pkg = require('../package.json');
     ;
 
@@ -68,27 +69,27 @@ program
                 else {
                     console.log('creating metaData folder');
 
-                    mkdirp(path.join(project, "/bind"), function (err) {
+                    mkdirp(path.join(project, slotJson.framework.metaData), function (err) {
                         if (err) console.error(err)
                         else {
                             console.log('creating webRootDir folder');
 
-                            mkdirp(path.join(project, "/www"), function (err) {
+                            mkdirp(path.join(project, slotJson.framework.webRootDir), function (err) {
                                 if (err) console.error(err)
                                 else {
                                     console.log('creating mvcRootDir folder');
 
-                                    mkdirp(path.join(project, "/app/mvc"), function (err) {
+                                    mkdirp(path.join(project, slotJson.framework.mvcRootDir), function (err) {
                                         if (err) console.error(err)
                                         else {
                                             console.log('creating restRootDir folder');
 
-                                            mkdirp(path.join(project, "/app/rest"), function (err) {
+                                            mkdirp(path.join(project, slotJson.framework.restRootDir), function (err) {
                                                 if (err) console.error(err)
                                                 else {
                                                     console.log('creating dbRootDir folder');
 
-                                                    mkdirp(path.join(project, "/app/db"), function (err) {
+                                                    mkdirp(path.join(project, slotJson.framework.dbRootDir), function (err) {
                                                         if (err) console.error(err)
                                                         else {
                                                             /*console.log('creating restFilter folder');*/
@@ -102,6 +103,14 @@ program
                                                              */
                                                             var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"),'binary'),
                                                                 pathFile = path.join(project, "slot.json");
+                                                            //
+                                                            /**
+                                                             * TODO:
+                                                             *  1.  Evaluate if creating a new project using -T option deserve to add basic fragments
+                                                             *      in the fragments section.
+                                                             */
+                                                            content = content
+                                                                .replace("{@fragments@}",  "");
                                                             //
                                                             fs.writeFile(pathFile, content, function (err) {
                                                                 if (err) throw err;
@@ -210,6 +219,9 @@ program
     .action(function(options){
         //console.log('Adding options %s %s', options.fragment, options.rest);
 
+        // Load local slot configuration
+        slotJson = require(path.join(process.cwd(), 'slot.json'));
+
         /**
          * TODO: validate if current folder contains a node.js module structure
          */
@@ -251,6 +263,9 @@ program
              */
 
             console.log('Exporting and minify current project.. %s', options.minify==true);
+
+            // Load local slot configuration
+            slotJson = require(path.join(process.cwd(), 'slot.json'));
 
             //slot export -m 'css,html'
 
@@ -387,14 +402,14 @@ function buildPage(pathToResources, projectFolder, page, isHomePage) {
 
     // Create JSON bind file
     buildResource(path.join(pathToResources, "ref-page-bind.json")
-        , path.join(path.join(projectFolder, "bind"), page+".json")
+        , path.join(path.join(projectFolder, slotJson.framework.metaData), page+".json")
         , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
         , [page, nowTimeStamp, pageType, "Welcome to "+pageType]
     );
 
     // Create HTML file
     buildResource(path.join(pathToResources, "ref-page.html")
-        , path.join(path.join(projectFolder, "www"), page+".html")
+        , path.join(path.join(projectFolder, slotJson.framework.webRootDir), page+".html")
         , ["page-name", "page-creation-date"]
         , [page, nowTimeStamp]);
 }
@@ -405,13 +420,13 @@ function buildFragment(pathToResources, projectFolder, fragment) {
         prefixedName = fragment.split('/').pop();
 
     buildResource(path.join(pathToResources, "ref-fragment-bind.json")
-        , path.join(path.join(projectFolder, "bind"), fragment+".json")
+        , path.join(path.join(projectFolder, slotJson.framework.metaData), fragment+".json")
         , ["fragmentID"]
         , [ 'frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1)) ]
     );
 
     buildResource(path.join(pathToResources, "ref-fragment.html")
-        , path.join(path.join(projectFolder, "www"), fragment+".html")
+        , path.join(path.join(projectFolder, slotJson.framework.webRootDir), fragment+".html")
         , ["fragment-name", "fragment-creation-date"]
         , [fragment, nowTimeStamp]);
 }
@@ -421,7 +436,7 @@ function buildRestService(pathToResources, projectFolder, rest) {
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
 
     buildResource(path.join(pathToResources, "ref-rest-service.js")
-        , path.join(path.join(projectFolder, "app/rest"), rest+".js")
+        , path.join(path.join(projectFolder, slotJson.framework.restRootDir), rest+".js")
         , ["rest-name", "rest-url", "pc-machine", "creation-date"]
         , [rest.split('/').pop(), "http://<server>:<port>/rest/"+rest, os.hostname, nowTimeStamp]);
 }
@@ -449,10 +464,10 @@ function addPage(pathToResources, projectFolder, page) {
 
         console.log('Adding new page [%s] on [%s]', page, folder);
         //
-        mkdirp(path.join(projectFolder, path.join("www", folder)), function (err) {
+        mkdirp(path.join(projectFolder, path.join(slotJson.framework.webRootDir, folder)), function (err) {
             if (err) console.error(err)
             else {
-                mkdirp(path.join(projectFolder, path.join("bind", folder)), function (err) {
+                mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
                     if (err) console.error(err)
                     else {
                         buildPage(pathToResources, projectFolder, page);
@@ -490,10 +505,10 @@ function addFragment(pathToResources, projectFolder, fragment) {
 
         console.log('Adding new fragment [%s] on [%s]', fragment, folder);
         //
-        mkdirp(path.join(projectFolder, path.join("www", folder)), function (err) {
+        mkdirp(path.join(projectFolder, path.join(slotJson.framework.webRootDir, folder)), function (err) {
             if (err) console.error(err)
             else {
-                mkdirp(path.join(projectFolder, path.join("bind", folder)), function (err) {
+                mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
                     if (err) console.error(err)
                     else {
                         buildFragment(pathToResources, projectFolder, fragment);
@@ -533,7 +548,7 @@ function addRestService(pathToResources, projectFolder, rest) {
 
         console.log('Adding new rest [%s] on [%s]', rest, folder);
         //
-        mkdirp(path.join(projectFolder, path.join("app/rest", folder)), function (err) {
+        mkdirp(path.join(projectFolder, path.join(slotJson.framework.restRootDir, folder)), function (err) {
             if (err) console.error(err)
             else {
                 buildRestService(pathToResources, projectFolder, rest);
