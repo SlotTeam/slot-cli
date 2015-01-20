@@ -1,12 +1,13 @@
 {
     "framework": {
-        "metaData":     "/design/bind",
-        "webRootDir":   "/www",
-        "mvcRootDir":   "/app/mvc",
-        "restRootDir":  "/app/rest",
-        "dbRootDir":    "/app/db",
-        "restFilter":   "/rest",
-        "mvcFilter":    "/mvc"
+        "metaData":         "/design/bind",
+        "fragmentRootDir":  "/design/fragment",
+        "webRootDir":       "/www",
+        "mvcRootDir":       "/app/mvc",
+        "restRootDir":      "/app/rest",
+        "dbRootDir":        "/app/db",
+        "restFilter":       "/rest",
+        "mvcFilter":        "/mvc"
     },
     "fragments": {
         {@fragments@}
