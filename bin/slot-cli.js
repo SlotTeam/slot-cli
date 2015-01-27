@@ -19,26 +19,13 @@ var program = require('commander'),
     path = require("path"),
     mkdirp = require('mkdirp'),
     sortObj = require('sort-object'),
-    slotJson = require('../slot.json'),
-    slotJsonFile = path.join(process.cwd(), 'slot.json'),
     pkg = require('../package.json')
     ;
+var slotJson,
+    slotJsonFile;
 
+//Set command line version
 program.version(pkg.version);
-
-/*program
-  .command('hi')
-  .description('initialize project configuration')
-  .action(function(){
-		console.log('Hi my Friend!!!');
-});
-
-program
-  .command('bye [name]')
-  .description('initialize project configuration')
-  .action(function(name){
-		console.log('Bye ' + name + '. It was good to see you!');
-});*/
 
 /**
  * TODO:
@@ -50,116 +37,127 @@ program
   .action(function(env){
     console.log('Enter a Valid command');
     console.log('   To see help use: slot -h');
-    //terminate(true);
 });
 
 program
     .command('create [project]')
     .description('Create a new project on folder [name]')
-
     //.option("-t, --theme [theme_id]", "Which theme_id to use in the project. It will install a predefined theme based on HTML5 frameworks like Bootstrap, Zurb, Kube.", null)
+
     /**
      * TODO: Complete the '-t, --theme' option
      */
 
     .action(function(project){
+
         if(project) {
-            console.log('Creating [%s] project!', project);
+            //Validate that we are not located on a valid slot project
+            isValidRootDir(process.cwd()
+                , function(exists) {
+                    console.log("\r\n It appears that you are located on a valid slot project, you can't execute 'create command' inside an existing slot project.");
+                }
+                , function(exists) {
+                    slotJson = require('../slot.json');
+                    slotJsonFile = path.join(process.cwd(), 'slot.json');
 
-            mkdirp(project, function (err) {
-                if (err) console.error(err)
-                else {
-                    console.log('creating metaData folder');
+                    console.log('Creating [%s] project!', project);
 
-                    mkdirp(path.join(project, slotJson.framework.metaData), function (err) {
+                    mkdirp(project, function (err) {
                         if (err) console.error(err)
                         else {
-                            console.log('creating fragmentRootDir folder');
+                            console.log('creating metaData folder');
 
-                            mkdirp(path.join(project, slotJson.framework.fragmentRootDir), function (err) {
+                            mkdirp(path.join(project, slotJson.framework.metaData), function (err) {
                                 if (err) console.error(err)
                                 else {
-                                    console.log('creating webRootDir folder');
+                                    console.log('creating fragmentRootDir folder');
 
-                                    mkdirp(path.join(project, slotJson.framework.webRootDir), function (err) {
+                                    mkdirp(path.join(project, slotJson.framework.fragmentRootDir), function (err) {
                                         if (err) console.error(err)
                                         else {
-                                            console.log('creating mvcRootDir folder');
+                                            console.log('creating webRootDir folder');
 
-                                            mkdirp(path.join(project, slotJson.framework.mvcRootDir), function (err) {
+                                            mkdirp(path.join(project, slotJson.framework.webRootDir), function (err) {
                                                 if (err) console.error(err)
                                                 else {
-                                                    console.log('creating restRootDir folder');
+                                                    console.log('creating mvcRootDir folder');
 
-                                                    mkdirp(path.join(project, slotJson.framework.restRootDir), function (err) {
+                                                    mkdirp(path.join(project, slotJson.framework.mvcRootDir), function (err) {
                                                         if (err) console.error(err)
                                                         else {
-                                                            console.log('creating dbRootDir folder');
+                                                            console.log('creating restRootDir folder');
 
-                                                            mkdirp(path.join(project, slotJson.framework.dbRootDir), function (err) {
+                                                            mkdirp(path.join(project, slotJson.framework.restRootDir), function (err) {
                                                                 if (err) console.error(err)
                                                                 else {
-                                                                    /*console.log('creating restFilter folder');*/
-                                                                    console.log('Running on  ' + __dirname);
+                                                                    console.log('creating dbRootDir folder');
 
-                                                                    var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-                                                                    console.log('Resources folder ' + pathToResources);
+                                                                    mkdirp(path.join(project, slotJson.framework.dbRootDir), function (err) {
+                                                                        if (err) console.error(err)
+                                                                        else {
+                                                                            /*console.log('creating restFilter folder');*/
+                                                                            console.log('Running on  ' + __dirname);
 
-                                                                    /**
-                                                                     * Create slot.json file
-                                                                     */
-                                                                    var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"),'binary'),
-                                                                        pathFile = path.join(project, "slot.json");
-                                                                    //
-                                                                    /**
-                                                                     * TODO:
-                                                                     *  1.  Evaluate if creating a new project using -T option deserve to add basic fragments
-                                                                     *      in the fragments section.
-                                                                     */
-                                                                    content = content
-                                                                        .replace("{@fragments@}",  "");
-                                                                    //
-                                                                    fs.writeFile(pathFile, content, function (err) {
-                                                                        if (err) throw err;
-                                                                        console.log('Saved slot.json on: ' + pathFile);
-
-                                                                        /**
-                                                                         * Create package.json file
-                                                                         */
-                                                                        content = fs.readFileSync(path.join(pathToResources, "ref-package.json"),'binary'),
-                                                                            pathFile = path.join(project, "package.json");
-                                                                        //
-                                                                        content = content
-                                                                            .replace("{@name@}",  project)
-                                                                            .replace("{@license@}",  "MIT");
-                                                                        //
-                                                                        fs.writeFile(pathFile, content, function (err) {
-                                                                            if (err) throw err;
-                                                                            console.log('Saved package.json on: ' + pathFile);
+                                                                            var pathToResources = path.join(path.join(__dirname, ".."), "resources");
+                                                                            console.log('Resources folder ' + pathToResources);
 
                                                                             /**
-                                                                             * Execute 'npm install' to build all dependencies
+                                                                             * Create slot.json file
                                                                              */
-                                                                            npmInstall(project);
-
-                                                                            buildServes(pathToResources, project);
-
-                                                                            /**
-                                                                             * Build project home page
-                                                                             */
-                                                                            buildPage(pathToResources, project, "index", true /*<<== isHomepage*/);
-
+                                                                            var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"),'binary'),
+                                                                                pathFile = path.join(project, "slot.json");
+                                                                            //
                                                                             /**
                                                                              * TODO:
-                                                                             *  1.  After creation show a message saying:
-                                                                             *      This project have been created with OneTheme, the oficial Bootstrap
-                                                                             *      custom theme for Slot Framework. You can see full show case of OneTheme
-                                                                             *      in:
-                                                                             *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
-                                                                             *
-                                                                             *      Or describe any other theme the user has selected
+                                                                             *  1.  Evaluate if creating a new project using -T option deserve to add basic fragments
+                                                                             *      in the fragments section.
                                                                              */
-                                                                        });
+                                                                            content = content
+                                                                                .replace("{@fragments@}",  "");
+                                                                            //
+                                                                            fs.writeFile(pathFile, content, function (err) {
+                                                                                if (err) throw err;
+                                                                                console.log('Saved slot.json on: ' + pathFile);
+
+                                                                                /**
+                                                                                 * Create package.json file
+                                                                                 */
+                                                                                content = fs.readFileSync(path.join(pathToResources, "ref-package.json"),'binary');
+                                                                                pathFile = path.join(project, "package.json");
+                                                                                //
+                                                                                content = content
+                                                                                    .replace("{@name@}",  project)
+                                                                                    .replace("{@license@}",  "MIT");
+                                                                                //
+                                                                                fs.writeFile(pathFile, content, function (err) {
+                                                                                    if (err) throw err;
+                                                                                    console.log('Saved package.json on: ' + pathFile);
+
+                                                                                    /**
+                                                                                     * Execute 'npm install' to build all dependencies
+                                                                                     */
+                                                                                    npmInstall(project);
+
+                                                                                    buildServes(pathToResources, project);
+
+                                                                                    /**
+                                                                                     * Build project home page
+                                                                                     */
+                                                                                    buildPage(pathToResources, project, "index", true /*<<== isHomepage*/);
+
+                                                                                    /**
+                                                                                     * TODO:
+                                                                                     *  1.  After creation show a message saying:
+                                                                                     *      This project have been created with OneTheme, the oficial Bootstrap
+                                                                                     *      custom theme for Slot Framework. You can see full show case of OneTheme
+                                                                                     *      in:
+                                                                                     *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
+                                                                                     *
+                                                                                     *      Or describe any other theme the user has selected
+                                                                                     */
+                                                                                });
+                                                                            });
+                                                                        }
                                                                     });
                                                                 }
                                                             });
@@ -174,10 +172,10 @@ program
                         }
                     });
                 }
-            });
+            );
         }
         else
-            console.log('Enter a project name');
+            console.log('Please enter a project name');
     });
 
 program
@@ -188,34 +186,39 @@ program
     .option("-d, --develop", "Start the development server on current slot project")
     .option("-a, --all", "Start designer and development server on current slot project")
     .action(function(options){
-        //console.log('Adding options %s %s', options.fragment, options.rest);
-        //console.log('Starting on [%s]', process.cwd());
+        //Validate that we are located on a valid slot project
+        isValidRootDir(process.cwd()
+            , function(exists) {
+                // Load local slot configuration
+                slotJson = require('../slot.json');
+                slotJsonFile = path.join(process.cwd(), 'slot.json');
 
-        /**
-         * TODO: validate if current folder contains a node.js module structure
-         */
+                //
+                var development = require('slot-framework'),
+                    designer = development.Designer
+                    ;
 
-        var development = require('slot-framework'),
-            designer = development.Designer
-            ;
-
-        if(options.develop) {
-            development.start();
-        }
-        else if(options.all) {
-            cmdUnderConstruction()
-        }
-        else if(options.port) {
-            cmdUnderConstruction()
-        }
-        else if(options.design || (!options.develop && !options.design && !options.all && !options.port)) {
-            designer.start();
-        }
-        else {
-            //console.log(options);
-            console.log('Please enter a valid command');
-            console.log('   To see help use: slot start -h');
-        }
+                if(options.develop) {
+                    development.start();
+                }
+                else if(options.all) {
+                    cmdUnderConstruction()
+                }
+                else if(options.port) {
+                    cmdUnderConstruction()
+                }
+                else if(options.design || (!options.develop && !options.design && !options.all && !options.port)) {
+                    designer.start();
+                }
+                else {
+                    console.log('Please enter a valid command');
+                    console.log('   To see help use: slot start -h');
+                }
+            }
+            , function(exists) {
+                console.log("\r\n It appears that you are not located on a project root folder, the 'slot.json' file was not found in current directory.");
+            }
+        );
     }
 );
 
@@ -226,43 +229,43 @@ program
     .option("-f, --fragment [fragment]", "Which fragment name to use", null)
     .option("-r, --rest [rest]", "Which rest service name to use", null)
     .action(function(options){
-        //console.log('Adding options %s %s', options.fragment, options.rest);
 
-        // Load local slot configuration
-        slotJson = require(slotJsonFile /*path.join(process.cwd(), 'slot.json')*/);
+        //Validate that we are located on a valid slot project root directory
+        isValidRootDir(process.cwd()
+            , function(exists) {
+                // Load local slot configuration
+                slotJson = require('../slot.json');
+                slotJsonFile = path.join(process.cwd(), 'slot.json');
 
-        /**
-         * TODO: validate if current folder contains a node.js module structure
-         */
+                //
+                var pathToResources = path.join(path.join(__dirname, ".."), "resources");
 
-        var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-
-        //console.log('Options [%s] [%s] [%s]', options.fragment, options.rest, options.page);
-
-        if(options.fragment) {
-            addFragment(pathToResources, process.cwd(), options.fragment);
-        }
-        else if(options.rest) {
-            addRestService(pathToResources, process.cwd(), options.rest);
-        }
-        else if(options.page) {
-            addPage(pathToResources, process.cwd(), options.page);
-        }
-        else {
-            console.log('Please enter a valid command');
-            console.log('   To see help use: slot add -h');
-        }
+                if(options.fragment) {
+                    addFragment(pathToResources, process.cwd(), options.fragment);
+                }
+                else if(options.rest) {
+                    addRestService(pathToResources, process.cwd(), options.rest);
+                }
+                else if(options.page) {
+                    addPage(pathToResources, process.cwd(), options.page);
+                }
+                else {
+                    console.log('Please enter a valid command');
+                    console.log('   To see help use: slot add -h');
+                }
+            }
+            , function(exists) {
+                console.log("\r\n It appears that you are not located on a project root folder, the 'slot.json' file was not found in current directory.");
+            }
+        );
     }
 );
-
 
 program
     .command('export *')
     .description('Export current slot project into optimized format, a zip file will be created with just necesary objects to deploy on Production Server')
     .option("-m, --minify [minify]", "Minify 'html, css, js' files on current slot project"/*, null*/ /*,"ALL"*/)
     .action(function(options){
-        //console.log(options);
-        console.log('Export options %s', options.minify);
 
         if(options.minify) {
 
@@ -293,7 +296,7 @@ program
 );
 
 
-
+// Invoke the command execution
 program.parse(process.argv);
 
 /**
@@ -316,6 +319,18 @@ var run = function(cmd, callback) {
         //callback();
     });
 };
+
+function isValidRootDir(dirPath, onExists, onDontExists) {
+
+    var slotJsonFile = path.join(dirPath, 'slot.json');
+
+    fs.exists(slotJsonFile, function(exists){
+        if(exists)
+            onExists(exists)
+        else
+            onDontExists(exists);
+    });
+}
 
 function npmInstall(project) {
 
@@ -528,7 +543,7 @@ function addFragment(pathToResources, projectFolder, fragment) {
                         var fragmentName = fragment.split('/').pop();
                         slotJson.fragments[fragmentName] = '/' + fragment;
                         slotJson.fragments = sortObj(slotJson.fragments);
-                        //delete fragmentName;
+                        delete fragmentName;
 
                         fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
                             if (err) throw err;
