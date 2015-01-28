@@ -19,12 +19,13 @@ var program = require('commander'),
     path = require("path"),
     mkdirp = require('mkdirp'),
     sortObj = require('sort-object'),
-    pkg = require('../package.json')
-    ;
+    cliHelper = require('./cliHelper'),
+    cliActions = require('./cliActions'),
+    pkg = require('../package.json');
 var slotJson,
     slotJsonFile;
 
-//Set command line version
+// Set command line version
 program.version(pkg.version);
 
 /**
@@ -33,30 +34,30 @@ program.version(pkg.version);
  */
 
 program
-  .command('*')
-  .action(function(env){
-    console.log('Enter a Valid command');
-    console.log('   To see help use: slot -h');
-});
+    .command('*')
+    .action(function (env) {
+        console.log('Enter a Valid command');
+        console.log('   To see help use: slot -h');
+    });
 
 program
     .command('create [project]')
     .description('Create a new project on folder [name]')
     //.option("-t, --theme [theme_id]", "Which theme_id to use in the project. It will install a predefined theme based on HTML5 frameworks like Bootstrap, Zurb, Kube.", null)
 
-    /**
-     * TODO: Complete the '-t, --theme' option
-     */
+/**
+ * TODO: Complete the '-t, --theme' option
+ */
 
-    .action(function(project){
+    .action(function (project) {
 
-        if(project) {
+        if (project) {
             //Validate that we are not located on a valid slot project
-            isValidRootDir(process.cwd()
-                , function(exists) {
+            cliHelper.isValidRootDir(process.cwd()
+                , function (exists) {
                     console.log("\r\n It appears that you are located on a valid slot project, you can't execute 'create command' inside an existing slot project.");
                 }
-                , function(exists) {
+                , function (exists) {
                     slotJson = require('../slot.json');
                     slotJsonFile = path.join(process.cwd(), 'slot.json');
 
@@ -104,7 +105,7 @@ program
                                                                             /**
                                                                              * Create slot.json file
                                                                              */
-                                                                            var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"),'binary'),
+                                                                            var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"), 'binary'),
                                                                                 pathFile = path.join(project, "slot.json");
                                                                             //
                                                                             /**
@@ -113,7 +114,7 @@ program
                                                                              *      in the fragments section.
                                                                              */
                                                                             content = content
-                                                                                .replace("{@fragments@}",  "");
+                                                                                .replace("{@fragments@}", "");
                                                                             //
                                                                             fs.writeFile(pathFile, content, function (err) {
                                                                                 if (err) throw err;
@@ -122,12 +123,12 @@ program
                                                                                 /**
                                                                                  * Create package.json file
                                                                                  */
-                                                                                content = fs.readFileSync(path.join(pathToResources, "ref-package.json"),'binary');
+                                                                                content = fs.readFileSync(path.join(pathToResources, "ref-package.json"), 'binary');
                                                                                 pathFile = path.join(project, "package.json");
                                                                                 //
                                                                                 content = content
-                                                                                    .replace("{@name@}",  project)
-                                                                                    .replace("{@license@}",  "MIT");
+                                                                                    .replace("{@name@}", project)
+                                                                                    .replace("{@license@}", "MIT");
                                                                                 //
                                                                                 fs.writeFile(pathFile, content, function (err) {
                                                                                     if (err) throw err;
@@ -136,14 +137,14 @@ program
                                                                                     /**
                                                                                      * Execute 'npm install' to build all dependencies
                                                                                      */
-                                                                                    npmInstall(project);
+                                                                                    cliHelper.npmInstall(project);
 
-                                                                                    buildServes(pathToResources, project);
+                                                                                    cliHelper.buildServers(pathToResources, project);
 
                                                                                     /**
                                                                                      * Build project home page
                                                                                      */
-                                                                                    buildPage(pathToResources, project, "index", true /*<<== isHomepage*/);
+                                                                                    cliHelper.buildPage(pathToResources, project, "index", slotJson, true /*<<== isHomepage*/);
 
                                                                                     /**
                                                                                      * TODO:
@@ -185,10 +186,10 @@ program
     .option("-s, --design", "Start the designer server on current slot project")
     .option("-d, --develop", "Start the development server on current slot project")
     .option("-a, --all", "Start designer and development server on current slot project")
-    .action(function(options){
+    .action(function (options) {
         //Validate that we are located on a valid slot project
-        isValidRootDir(process.cwd()
-            , function(exists) {
+        cliHelper.isValidRootDir(process.cwd()
+            , function (exists) {
                 // Load local slot configuration
                 slotJson = require('../slot.json');
                 slotJsonFile = path.join(process.cwd(), 'slot.json');
@@ -198,16 +199,16 @@ program
                     designer = development.Designer
                     ;
 
-                if(options.develop) {
+                if (options.develop) {
                     development.start();
                 }
-                else if(options.all) {
-                    cmdUnderConstruction()
+                else if (options.all) {
+                    cliHelper.cmdUnderConstruction()
                 }
-                else if(options.port) {
-                    cmdUnderConstruction()
+                else if (options.port) {
+                    cliHelper.cmdUnderConstruction()
                 }
-                else if(options.design || (!options.develop && !options.design && !options.all && !options.port)) {
+                else if (options.design || (!options.develop && !options.design && !options.all && !options.port)) {
                     designer.start();
                 }
                 else {
@@ -215,7 +216,7 @@ program
                     console.log('   To see help use: slot start -h');
                 }
             }
-            , function(exists) {
+            , function (exists) {
                 console.log("\r\n It appears that you are not located on a project root folder, the 'slot.json' file was not found in current directory.");
             }
         );
@@ -228,11 +229,11 @@ program
     .option("-p, --page [page]", "Which page name to use", null)
     .option("-f, --fragment [fragment]", "Which fragment name to use", null)
     .option("-r, --rest [rest]", "Which rest service name to use", null)
-    .action(function(options){
+    .action(function (options) {
 
         //Validate that we are located on a valid slot project root directory
-        isValidRootDir(process.cwd()
-            , function(exists) {
+        cliHelper.isValidRootDir(process.cwd()
+            , function (exists) {
                 // Load local slot configuration
                 slotJson = require('../slot.json');
                 slotJsonFile = path.join(process.cwd(), 'slot.json');
@@ -240,21 +241,21 @@ program
                 //
                 var pathToResources = path.join(path.join(__dirname, ".."), "resources");
 
-                if(options.fragment) {
-                    addFragment(pathToResources, process.cwd(), options.fragment);
+                if (options.fragment) {
+                    cliActions.addFragment(pathToResources, process.cwd(), options.fragment, slotJson, slotJsonFile);
                 }
-                else if(options.rest) {
-                    addRestService(pathToResources, process.cwd(), options.rest);
+                else if (options.rest) {
+                    cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson);
                 }
-                else if(options.page) {
-                    addPage(pathToResources, process.cwd(), options.page);
+                else if (options.page) {
+                    cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson);
                 }
                 else {
                     console.log('Please enter a valid command');
                     console.log('   To see help use: slot add -h');
                 }
             }
-            , function(exists) {
+            , function (exists) {
                 console.log("\r\n It appears that you are not located on a project root folder, the 'slot.json' file was not found in current directory.");
             }
         );
@@ -265,16 +266,16 @@ program
     .command('export *')
     .description('Export current slot project into optimized format, a zip file will be created with just necesary objects to deploy on Production Server')
     .option("-m, --minify [minify]", "Minify 'html, css, js' files on current slot project"/*, null*/ /*,"ALL"*/)
-    .action(function(options){
+    .action(function (options) {
 
-        if(options.minify) {
+        if (options.minify) {
 
             /**
              * TODO:
              *  1.  Validate if(options.minify.trim()!='') when calling buildExport()
              */
 
-            console.log('Exporting and minify current project.. %s', options.minify==true);
+            console.log('Exporting and minify current project.. %s', options.minify == true);
 
             // Load local slot configuration
             slotJson = require(slotJsonFile /*path.join(process.cwd(), 'slot.json')*/);
@@ -286,11 +287,11 @@ program
 
             console.log('Exporting and minify current project, extensions %s', extensions);
 
-            cmdUnderConstruction();
+            cliHelper.cmdUnderConstruction();
         }
         else {
             console.log('Exporting current project..');
-            cmdUnderConstruction();
+            cliHelper.cmdUnderConstruction();
         }
     }
 );
@@ -298,304 +299,3 @@ program
 
 // Invoke the command execution
 program.parse(process.argv);
-
-/**
- * Utility functions
- */
-var exec = require('child_process').exec;
-
-var run = function(cmd, callback) {
-    var child = exec(cmd, function (error, stdout, stderr) {
-        if (stderr !== null) {
-            console.log('' + stderr);
-        }
-        if (stdout !== null) {
-            console.log('' + stdout);
-        }
-        if (error !== null) {
-            console.log('' + error);
-        }
-
-        //callback();
-    });
-};
-
-function isValidRootDir(dirPath, onExists, onDontExists) {
-
-    var slotJsonFile = path.join(dirPath, 'slot.json');
-
-    fs.exists(slotJsonFile, function(exists){
-        if(exists)
-            onExists(exists)
-        else
-            onDontExists(exists);
-    });
-}
-
-function npmInstall(project) {
-
-    if(project.trim()!='') {
-
-        var current = process.cwd(),
-            folder = path.join(process.cwd(), project);
-
-        console.log('Installing new project [%s]', folder);
-        process.chdir(folder);
-
-        /**
-         * Execute npm install for all dependencies..
-         */
-        run('npm install' /*, function() {
-        }*/);
-
-        console.log('Project [%s] installed on [%s]', project, folder);
-        process.chdir(current);
-    }
-    else {
-        console.log('Please enter a valid project name');
-        console.log('   To see help use: slot -h');
-    }
-}
-
-function cmdUnderConstruction() {
-    console.log();
-    console.log(' * This command option is under construction, we are * ');
-    console.log(' * working hard to release as soon as possible.. :-) * ');
-    console.log();
-}
-
-/**
- * Creates a resource (images, html, jsonFile, etc) on filesystem, then performs
- * a variable substitution finding the expressions on "attrs" array and replacing
- * a corresponding value from "values" array.
- *
- * @param source
- * @param destiny
- * @param attrs
- * @param values
- */
-function buildResource(source, destiny, attrs, values) {
-
-    // Load content
-    var content = fs.readFileSync(source,'binary'),
-        pathFile = destiny;
-
-    // Substitute attributes and values
-    for(var index in attrs){
-        console.log('Attr [%s] [%s]', attrs[index], values[index]);
-        content = content.replace(RegExp("{@" + attrs[index] + "@}","g"),  values[index]);
-    }
-
-    // Write content on file
-    /*fs.writeFile(pathFile, content, function (err) {
-        if (err) throw err;
-        console.log('Saved resource on: %s', pathFile);
-    });*/
-    fs.writeFileSync(pathFile, content);
-    console.log('Saved resource on: %s', pathFile);
-}
-
-function buildServes(pathToResources, projectFolder) {
-
-    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
-
-    mkdirp(path.join(projectFolder, "server"), function (err) {
-        if (err) console.error(err)
-        else {
-            console.log('Creating servers..');
-
-            buildResource(path.join(pathToResources, "ref-designerServer.js")
-                , path.join(path.join(projectFolder, "server"), "designer.js")
-                , ["page-creation-date"]
-                , [nowTimeStamp]);
-
-            buildResource(path.join(pathToResources, "ref-developerServer.js")
-                , path.join(path.join(projectFolder, "server"), "developer.js")
-                , ["page-creation-date"]
-                , [nowTimeStamp]);
-        }
-    });
-}
-
-function buildPage(pathToResources, projectFolder, page, isHomePage) {
-
-    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
-        pageType = isHomePage ? " home page " : " page ",
-        pageType = isHomePage ? projectFolder+pageType : page+pageType
-        ;
-
-    // Create JSON bind file
-    buildResource(path.join(pathToResources, "ref-page-bind.json")
-        , path.join(path.join(projectFolder, slotJson.framework.metaData), page+".json")
-        , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
-        , [page, nowTimeStamp, pageType, "Welcome to "+pageType]
-    );
-
-    // Create HTML file
-    buildResource(path.join(pathToResources, "ref-page.html")
-        , path.join(path.join(projectFolder, slotJson.framework.webRootDir), page+".html")
-        , ["page-name", "page-creation-date"]
-        , [page, nowTimeStamp]);
-}
-
-function buildFragment(pathToResources, projectFolder, fragment) {
-
-    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
-        prefixedName = fragment.split('/').pop();
-
-    buildResource(path.join(pathToResources, "ref-fragment-bind.json")
-        , path.join(path.join(projectFolder, slotJson.framework.metaData), fragment+".json")
-        , ["fragmentID"]
-        , [ 'frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1)) ]
-    );
-
-    buildResource(path.join(pathToResources, "ref-fragment.html")
-        , path.join(path.join(projectFolder, slotJson.framework.fragmentRootDir), fragment+".html")
-        , ["fragment-name", "fragment-creation-date"]
-        , [fragment, nowTimeStamp]);
-}
-
-function buildRestService(pathToResources, projectFolder, rest) {
-
-    var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
-
-    buildResource(path.join(pathToResources, "ref-rest-service.js")
-        , path.join(path.join(projectFolder, slotJson.framework.restRootDir), rest+".js")
-        , ["rest-name", "rest-url", "pc-machine", "creation-date"]
-        , [rest.split('/').pop(), "http://<server>:<port>/rest/"+rest, os.hostname, nowTimeStamp]);
-}
-
-/**
- *
- * @param pathToResources   The full path were the slot-cli/resources folder has been created
- * @param projectFolder     The full path were the project folder has been created
- * @param page              The page name
- */
-function addPage(pathToResources, projectFolder, page) {
-
-    if(page.trim()!='') {
-        console.log('Adding new page [%s]', page);
-
-        /**
-         * Validate if exists the full-path folder where the file will be created,
-         * then continue whit the buildPage() function
-         */
-        var folder = page.split('/').pop(); // Using '/' because we are talking about web contexts
-
-        console.log('Adding new page name [%s]', folder);
-
-        folder = page.replace(folder, '');
-
-        console.log('Adding new page [%s] on [%s]', page, folder);
-        //
-        mkdirp(path.join(projectFolder, path.join(slotJson.framework.webRootDir, folder)), function (err) {
-            if (err) console.error(err)
-            else {
-                mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
-                    if (err) console.error(err)
-                    else {
-                        buildPage(pathToResources, projectFolder, page);
-                    }
-                });
-            }
-        });
-
-        console.log('Page [%s] created on [%s]', page, 'todo_path');
-    }
-    else {
-        console.log('Please enter a valid page name');
-        console.log('   To see help use: slot add -h');
-    }
-}
-
-function addFragment(pathToResources, projectFolder, fragment) {
-
-    if(fragment.trim()!='') {
-        console.log('Adding new fragment [%s]', fragment);
-
-        /**
-         * Validate if exists the full-path folder where the file will be created,
-         * then continue whit the buildFragment() function
-         */
-        var folder = fragment.split('/').pop(); // Using '/' because we are talking about web contexts
-
-        //var fileName = 'frg' + (folder.charAt(0).toUpperCase() + folder.slice(1));
-        var fileName = folder;
-        fragment = fragment.replace(folder, fileName);
-        folder = fileName;
-
-        console.log('Adding new fragment name [%s]', folder);
-
-        folder = fragment.replace(folder, '');
-
-        console.log('Adding new fragment [%s] on [%s]', fragment, folder);
-        //
-        mkdirp(path.join(projectFolder, path.join(slotJson.framework.fragmentRootDir, folder)), function (err) {
-            if (err) console.error(err)
-            else {
-                mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
-                    if (err) console.error(err)
-                    else {
-                        // Create fragment objects on file system
-                        buildFragment(pathToResources, projectFolder, fragment);
-
-                        // Add the newly created fragment on slot.framework.json file
-                        var fragmentName = fragment.split('/').pop();
-                        slotJson.fragments[fragmentName] = '/' + fragment;
-                        slotJson.fragments = sortObj(slotJson.fragments);
-                        delete fragmentName;
-
-                        fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
-                            if (err) throw err;
-                            console.log('Saved resource on: %s', slotJsonFile);
-                        });
-                    }
-                });
-            }
-        });
-
-        console.log('Fragment [%s] created on [%s]', fragment, 'todo_path');
-    }
-    else {
-        console.log('Please enter a valid fragment name');
-        console.log('   To see help use: slot add -h');
-    }
-}
-
-/**
- *
- * @param pathToResources   The full path were the slot-cli/resources folder has been created
- * @param projectFolder     The full path were the project folder has been created
- * @param rest              The rest service name
- */
-function addRestService(pathToResources, projectFolder, rest) {
-
-    if(rest.trim()!='') {
-        console.log('Adding new rest service [%s]', rest);
-
-        /**
-         * Validate if exists the full-path folder where the file will be created,
-         * then continue whit the buildRestService() function
-         */
-        var folder = rest.split('/').pop(); // Using '/' because we are talking about web contexts
-
-        console.log('Adding new rest name [%s]', folder);
-
-        folder = rest.replace(folder, '');
-
-        console.log('Adding new rest [%s] on [%s]', rest, folder);
-        //
-        mkdirp(path.join(projectFolder, path.join(slotJson.framework.restRootDir, folder)), function (err) {
-            if (err) console.error(err)
-            else {
-                buildRestService(pathToResources, projectFolder, rest);
-            }
-        });
-
-        console.log('Rest service [%s] created on [%s]', rest, 'todo_path');
-    }
-    else {
-        console.log('Please enter a valid rest service name');
-        console.log('   To see help use: slot add -h');
-    }
-}
