@@ -32,10 +32,12 @@
     "url": "https://github.com/SlotTeam/slot-cli.git"
   },
   "dependencies": {
+    "colors": "^0.6.2",
     "commander": ">=1.0.0",
     "mkdirp": "0.3.5",
     "slot-framework": ">= 0.0.1",
-    "sort-object": "^0.3.2"
+    "sort-object": "^0.3.2",
+    "string": "^2.0.0"
   },
   "engines": {
     "node": ">= 0.10.0"

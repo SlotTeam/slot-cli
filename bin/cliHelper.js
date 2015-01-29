@@ -6,11 +6,17 @@ var os = require("os"),
     fs = require("fs"),
     path = require("path"),
     mkdirp = require('mkdirp'),
-    exec = require('child_process').exec;
+    exec = require('child_process').exec,
+    pretty = require('./prettyMessage');
 
 var run = function (cmd, callback) {
     var child = exec(cmd, function (error, stdout, stderr) {
-        if (stderr !== null) {
+
+        /**
+         * TODO:
+         *  1.  Pass a parameter to know if we are going to show the stdout/stderr/error
+         */
+        /*if (stderr !== null) {
             console.log('' + stderr);
         }
         if (stdout !== null) {
@@ -18,7 +24,7 @@ var run = function (cmd, callback) {
         }
         if (error !== null) {
             console.log('' + error);
-        }
+        }*/
         //callback();
     });
 };
@@ -42,7 +48,7 @@ function npmInstall(project) {
         var current = process.cwd(),
             folder = path.join(process.cwd(), project);
 
-        console.log('Installing new project [%s]', folder);
+        pretty.doing("Installing new project '%s'", folder);
         process.chdir(folder);
 
         /**
@@ -51,20 +57,20 @@ function npmInstall(project) {
         run('npm install' /*, function() {
          }*/);
 
-        console.log('Project [%s] installed on [%s]', project, folder);
+        pretty.done("Project '%s' installed on '%s'", project, folder);
         process.chdir(current);
     }
     else {
-        console.log('Please enter a valid project name');
-        console.log('   To see help use: slot -h');
+        pretty.alert("Please enter a valid project name");
+        pretty.doing("   To see help use: slot -h");
     }
 }
 
 function cmdUnderConstruction() {
-    console.log();
-    console.log(' * This command option is under construction, we are * ');
-    console.log(' * working hard to release as soon as possible.. :-) * ');
-    console.log();
+    pretty.alert();
+    pretty.alert(" * This command option is under construction, we are * ");
+    pretty.alert(" * working hard to release as soon as possible.. :-) * ");
+    pretty.alert();
 }
 
 /**
@@ -94,7 +100,8 @@ function buildResource(source, destiny, attrs, values) {
      console.log('Saved resource on: %s', pathFile);
      });*/
     fs.writeFileSync(pathFile, content);
-    console.log('Saved resource on: %s', pathFile);
+
+    pretty.inform('Resource created on %s', pathFile);
 }
 
 function buildServers(pathToResources, projectFolder) {
@@ -104,7 +111,7 @@ function buildServers(pathToResources, projectFolder) {
     mkdirp(path.join(projectFolder, "server"), function (err) {
         if (err) console.error(err)
         else {
-            console.log('Creating servers..');
+            pretty.doing("Creating servers..");
 
             buildResource(path.join(pathToResources, "ref-designerServer.js")
                 , path.join(path.join(projectFolder, "server"), "designer.js")
@@ -148,7 +155,8 @@ function buildFragment(pathToResources, projectFolder, fragment, slotJson) {
     buildResource(path.join(pathToResources, "ref-fragment-bind.json")
         , path.join(path.join(projectFolder, slotJson.framework.metaData), fragment + ".json")
         , ["fragmentID"]
-        , ['frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1))]
+        //, ['frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1))]
+        , [prefixedName]
     );
 
     buildResource(path.join(pathToResources, "ref-fragment.html")

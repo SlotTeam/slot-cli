@@ -21,6 +21,7 @@ var program = require('commander'),
     sortObj = require('sort-object'),
     cliHelper = require('./cliHelper'),
     cliActions = require('./cliActions'),
+    pretty = require('./prettyMessage'),
     pkg = require('../package.json');
 var slotJson,
     slotJsonFile;
@@ -55,52 +56,53 @@ program
             //Validate that we are not located on a valid slot project
             cliHelper.isValidRootDir(process.cwd()
                 , function (exists) {
-                    console.log("\r\n It appears that you are located on a valid slot project, you can't execute 'create command' inside an existing slot project.");
+                    pretty.alert();
+                    pretty.alert("It appears that you are located on a valid slot project, you can't execute 'create command' inside an existing slot project.");
                 }
                 , function (exists) {
                     slotJson = require('../slot.json');
                     slotJsonFile = path.join(process.cwd(), 'slot.json');
 
-                    console.log('Creating [%s] project!', project);
+                    pretty.doing("Creating '%s' project!", project);
 
                     mkdirp(project, function (err) {
                         if (err) console.error(err)
                         else {
-                            console.log('creating metaData folder');
+                            pretty.doing("creating metaData folder");
 
                             mkdirp(path.join(project, slotJson.framework.metaData), function (err) {
                                 if (err) console.error(err)
                                 else {
-                                    console.log('creating fragmentRootDir folder');
+                                    pretty.doing("creating fragmentRootDir folder");
 
                                     mkdirp(path.join(project, slotJson.framework.fragmentRootDir), function (err) {
                                         if (err) console.error(err)
                                         else {
-                                            console.log('creating webRootDir folder');
+                                            pretty.doing("creating webRootDir folder");
 
                                             mkdirp(path.join(project, slotJson.framework.webRootDir), function (err) {
                                                 if (err) console.error(err)
                                                 else {
-                                                    console.log('creating mvcRootDir folder');
+                                                    pretty.doing("creating mvcRootDir folder");
 
                                                     mkdirp(path.join(project, slotJson.framework.mvcRootDir), function (err) {
                                                         if (err) console.error(err)
                                                         else {
-                                                            console.log('creating restRootDir folder');
+                                                            pretty.doing("creating restRootDir folder");
 
                                                             mkdirp(path.join(project, slotJson.framework.restRootDir), function (err) {
                                                                 if (err) console.error(err)
                                                                 else {
-                                                                    console.log('creating dbRootDir folder');
+                                                                    pretty.doing("creating dbRootDir folder");
 
                                                                     mkdirp(path.join(project, slotJson.framework.dbRootDir), function (err) {
                                                                         if (err) console.error(err)
                                                                         else {
-                                                                            /*console.log('creating restFilter folder');*/
-                                                                            console.log('Running on  ' + __dirname);
+                                                                            /*pretty.doing("creating restFilter folder');*/
+                                                                            pretty.inform("Running on  " + __dirname);
 
                                                                             var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-                                                                            console.log('Resources folder ' + pathToResources);
+                                                                            pretty.inform("Resources folder " + pathToResources);
 
                                                                             /**
                                                                              * Create slot.json file
@@ -118,7 +120,7 @@ program
                                                                             //
                                                                             fs.writeFile(pathFile, content, function (err) {
                                                                                 if (err) throw err;
-                                                                                console.log('Saved slot.json on: ' + pathFile);
+                                                                                pretty.inform("Saved slot.json on: " + pathFile);
 
                                                                                 /**
                                                                                  * Create package.json file
@@ -132,7 +134,7 @@ program
                                                                                 //
                                                                                 fs.writeFile(pathFile, content, function (err) {
                                                                                     if (err) throw err;
-                                                                                    console.log('Saved package.json on: ' + pathFile);
+                                                                                    pretty.inform("Saved package.json on: " + pathFile);
 
                                                                                     /**
                                                                                      * Execute 'npm install' to build all dependencies
@@ -191,8 +193,8 @@ program
         cliHelper.isValidRootDir(process.cwd()
             , function (exists) {
                 // Load local slot configuration
-                slotJson = require('../slot.json');
                 slotJsonFile = path.join(process.cwd(), 'slot.json');
+                slotJson = require(slotJsonFile);
 
                 //
                 var development = require('slot-framework'),
@@ -217,7 +219,8 @@ program
                 }
             }
             , function (exists) {
-                console.log("\r\n It appears that you are not located on a project root folder, the 'slot.json' file was not found in current directory.");
+                pretty.alert();
+                pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
             }
         );
     }
@@ -235,8 +238,8 @@ program
         cliHelper.isValidRootDir(process.cwd()
             , function (exists) {
                 // Load local slot configuration
-                slotJson = require('../slot.json');
                 slotJsonFile = path.join(process.cwd(), 'slot.json');
+                slotJson = require(slotJsonFile);
 
                 //
                 var pathToResources = path.join(path.join(__dirname, ".."), "resources");
@@ -256,7 +259,8 @@ program
                 }
             }
             , function (exists) {
-                console.log("\r\n It appears that you are not located on a project root folder, the 'slot.json' file was not found in current directory.");
+                pretty.alert();
+                pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
             }
         );
     }
