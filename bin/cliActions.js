@@ -16,8 +16,10 @@ var path = require("path"),
  * @param {string} projectFolder     Full path where the project folder has been created
  * @param {string} page              The page name
  * @param {Object} slotJson          JavaScript object that holds the 'slot.json' file config
+ * @param {boleean} isHomePage          JavaScript object that holds the 'slot.json' file config
+ * @param callback
  */
-function addPage(pathToResources, projectFolder, page, slotJson, callback) {
+function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, callback) {
 
     if (page.trim() != '') {
         pretty.doing("Adding new page '%s'", page);
@@ -32,15 +34,10 @@ function addPage(pathToResources, projectFolder, page, slotJson, callback) {
                 callback(err); //console.error(err)
             else {
                 mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
-                    if (err) {
-                        /*pretty.failed("Fail creating '%s'", page);
-                        throw err;*/
+                    if (err)
                         callback(err);
-                    }
                     else {
-                        cliHelper.buildPage(pathToResources, projectFolder, page, slotJson, callback);
-
-                        pretty.done("Page '%s' created on '%s'", page/*, 'todo_path'*/);
+                        cliHelper.buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, callback);
                     }
                 });
             }

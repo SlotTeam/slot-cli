@@ -100,12 +100,17 @@ function buildResource(source, destiny, attrs, values, callback) {
      if (err) throw err;
      console.log('Saved resource on: %s', pathFile);
      });*/
-    fs.writeFileSync(pathFile, content);
+    /*fs.writeFileSync(pathFile, content);
 
-    pretty.inform('Resource created on %s', pathFile);
+    pretty.inform('Resource created on %s', pathFile);*/
 
-    if(callback)
-        callback(true);
+    fs.writeFile(pathFile, content, function(err) {
+        //if(callback) {
+            callback(err);
+        //}
+        //else
+        //    pretty.inform('X Resource created on %s', pathFile);
+    });
 }
 
 function buildServers(pathToResources, projectFolder) {
@@ -142,13 +147,20 @@ function buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, c
         , path.join(path.join(projectFolder, slotJson.framework.metaData), page + ".json")
         , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
         , [page, nowTimeStamp, pageType, "Welcome to " + pageType]
+        , function(err) {
+            if(!err)
+                callback(false);
+            else {
+                //Create HTML file
+                buildResource(path.join(pathToResources, "ref-page.html")
+                    , path.join(path.join(projectFolder, slotJson.framework.webRootDir), page + ".html")
+                    , ["page-name", "page-creation-date"]
+                    , [page, nowTimeStamp]
+                    , callback
+                );
+            }
+        }
     );
-
-    // Create HTML file
-    buildResource(path.join(pathToResources, "ref-page.html")
-        , path.join(path.join(projectFolder, slotJson.framework.webRootDir), page + ".html")
-        , ["page-name", "page-creation-date"]
-        , [page, nowTimeStamp]);
 }
 
 function buildFragment(pathToResources, projectFolder, fragment, slotJson) {

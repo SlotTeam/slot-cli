@@ -267,7 +267,12 @@ program.command('add')
                     cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson);
                 }
                 else if (options.page) {
-                    cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson);
+                    cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, function(err) {
+                        if(err)
+                            pretty.failed("Fail creating page '%s'", options.page);
+                        else
+                            pretty.done("Page '%s' created on '%s'", options.page/*, 'todo_path'*/, err);
+                    });
                 }
                 else {
                     pretty.alert();
