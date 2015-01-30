@@ -82,8 +82,9 @@ function cmdUnderConstruction() {
  * @param destiny
  * @param attrs
  * @param values
+ * @param callback
  */
-function buildResource(source, destiny, attrs, values) {
+function buildResource(source, destiny, attrs, values, callback) {
 
     // Load content
     var content = fs.readFileSync(source, 'binary'),
@@ -102,6 +103,9 @@ function buildResource(source, destiny, attrs, values) {
     fs.writeFileSync(pathFile, content);
 
     pretty.inform('Resource created on %s', pathFile);
+
+    if(callback)
+        callback(true);
 }
 
 function buildServers(pathToResources, projectFolder) {
@@ -126,7 +130,7 @@ function buildServers(pathToResources, projectFolder) {
     });
 }
 
-function buildPage(pathToResources, projectFolder, page, slotJson, isHomePage) {
+function buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, callback) {
 
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
         pageType = isHomePage ? " home page " : " page ",

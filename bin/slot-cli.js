@@ -34,21 +34,17 @@ program.version(pkg.version);
  *  1.  Add a program command to control 'no parameters send by user'
  */
 
-program
-    .command('*')
+program.command('*')
     .action(function (env) {
-        console.log('Enter a Valid command');
-        console.log('   To see help use: slot -h');
+        pretty.alert();
+        pretty.alert("Enter a Valid command");
+        pretty.alert("   To see help use: slot -h");
     });
 
-program
-    .command('create [project]')
+program.command('create [project]')
     .description('Create a new project on folder [name]')
     //.option("-t, --theme [theme_id]", "Which theme_id to use in the project. It will install a predefined theme based on HTML5 frameworks like Bootstrap, Zurb, Kube.", null)
-
-/**
- * TODO: Complete the '-t, --theme' option
- */
+    //TODO: Complete the '-t, --theme' option
 
     .action(function (project) {
 
@@ -66,39 +62,59 @@ program
                     pretty.doing("Creating '%s' project!", project);
 
                     mkdirp(project, function (err) {
-                        if (err) console.error(err)
+                        if (err) {
+                            pretty.failed("Fail creating '%s'", project);
+                            throw err;
+                        }
                         else {
                             pretty.doing("creating metaData folder");
 
                             mkdirp(path.join(project, slotJson.framework.metaData), function (err) {
-                                if (err) console.error(err)
+                                if (err) {
+                                    pretty.fail("Fail creating meta-data layer folder");
+                                    throw err;
+                                }
                                 else {
                                     pretty.doing("creating fragmentRootDir folder");
 
                                     mkdirp(path.join(project, slotJson.framework.fragmentRootDir), function (err) {
-                                        if (err) console.error(err)
+                                        if (err) {
+                                            pretty.fail("Fail creating Fragments layer folder");
+                                            throw err;
+                                        }
                                         else {
                                             pretty.doing("creating webRootDir folder");
 
                                             mkdirp(path.join(project, slotJson.framework.webRootDir), function (err) {
-                                                if (err) console.error(err)
+                                                if (err) {
+                                                    pretty.fail("Fail creating Web root folder");
+                                                    throw err;
+                                                }
                                                 else {
                                                     pretty.doing("creating mvcRootDir folder");
 
                                                     mkdirp(path.join(project, slotJson.framework.mvcRootDir), function (err) {
-                                                        if (err) console.error(err)
+                                                        if (err) {
+                                                            pretty.fail("Fail creating REST layer folder");
+                                                            throw err;
+                                                        }
                                                         else {
                                                             pretty.doing("creating restRootDir folder");
 
                                                             mkdirp(path.join(project, slotJson.framework.restRootDir), function (err) {
-                                                                if (err) console.error(err)
+                                                                if (err) {
+                                                                    pretty.fail("Fail creating REST layer folder");
+                                                                    throw err;
+                                                                }
                                                                 else {
                                                                     pretty.doing("creating dbRootDir folder");
 
                                                                     mkdirp(path.join(project, slotJson.framework.dbRootDir), function (err) {
-                                                                        if (err) console.error(err)
+                                                                        if (err) {
+                                                                            pretty.fail("Fail creating DB layer folder");
+                                                                            throw err;
+                                                                        }
                                                                         else {
-                                                                            /*pretty.doing("creating restFilter folder');*/
                                                                             pretty.inform("Running on  " + __dirname);
 
                                                                             var pathToResources = path.join(path.join(__dirname, ".."), "resources");
@@ -115,12 +131,14 @@ program
                                                                              *  1.  Evaluate if creating a new project using -T option deserve to add basic fragments
                                                                              *      in the fragments section.
                                                                              */
-                                                                            content = content
-                                                                                .replace("{@fragments@}", "");
+                                                                            content = content.replace("{@fragments@}", "");
                                                                             //
                                                                             fs.writeFile(pathFile, content, function (err) {
-                                                                                if (err) throw err;
-                                                                                pretty.inform("Saved slot.json on: " + pathFile);
+                                                                                if (err) {
+                                                                                    pretty.fail("Fail creating slot.json file on: %s", pathFile);
+                                                                                    throw err;
+                                                                                }
+                                                                                pretty.inform("Saved slot.json on: &s", pathFile);
 
                                                                                 /**
                                                                                  * Create package.json file
@@ -177,17 +195,18 @@ program
                 }
             );
         }
-        else
-            console.log('Please enter a project name');
+        else {
+            pretty.alert();
+            pretty.alert("Please enter a project name");
+        }
     });
 
-program
-    .command('start')
+program.command('start')
     .description('Start servers on current slot project, without parameters, it starts the designer server by default')
     //.option("-p, --port [port]", "specify the port [3000]", /*Number,*/ 3000)
-    .option("-s, --design", "Start the designer server on current slot project")
-    .option("-d, --develop", "Start the development server on current slot project")
-    .option("-a, --all", "Start designer and development server on current slot project")
+    .option("-s, --design", "Start the designer server on current project")
+    .option("-d, --develop", "Start the development server on current project")
+    .option("-a, --all", "Start designer and development server on current project")
     .action(function (options) {
         //Validate that we are located on a valid slot project
         cliHelper.isValidRootDir(process.cwd()
@@ -195,11 +214,9 @@ program
                 // Load local slot configuration
                 slotJsonFile = path.join(process.cwd(), 'slot.json');
                 slotJson = require(slotJsonFile);
-
                 //
                 var development = require('slot-framework'),
-                    designer = development.Designer
-                    ;
+                    designer = development.Designer;
 
                 if (options.develop) {
                     development.start();
@@ -214,8 +231,9 @@ program
                     designer.start();
                 }
                 else {
-                    console.log('Please enter a valid command');
-                    console.log('   To see help use: slot start -h');
+                    pretty.alert();
+                    pretty.alert("Please enter a valid command");
+                    pretty.alert("   To see help use: slot start -h");
                 }
             }
             , function (exists) {
@@ -226,8 +244,7 @@ program
     }
 );
 
-program
-    .command('add')
+program.command('add')
     .description('Add a new object to current slot project')
     .option("-p, --page [page]", "Which page name to use", null)
     .option("-f, --fragment [fragment]", "Which fragment name to use", null)
@@ -240,7 +257,6 @@ program
                 // Load local slot configuration
                 slotJsonFile = path.join(process.cwd(), 'slot.json');
                 slotJson = require(slotJsonFile);
-
                 //
                 var pathToResources = path.join(path.join(__dirname, ".."), "resources");
 
@@ -254,8 +270,9 @@ program
                     cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson);
                 }
                 else {
-                    console.log('Please enter a valid command');
-                    console.log('   To see help use: slot add -h');
+                    pretty.alert();
+                    pretty.alert("Please enter a valid command");
+                    pretty.alert("   To see help use: slot add -h");
                 }
             }
             , function (exists) {
@@ -266,8 +283,7 @@ program
     }
 );
 
-program
-    .command('export *')
+program.command('export *')
     .description('Export current slot project into optimized format, a zip file will be created with just necesary objects to deploy on Production Server')
     .option("-m, --minify [minify]", "Minify 'html, css, js' files on current slot project"/*, null*/ /*,"ALL"*/)
     .action(function (options) {
@@ -290,13 +306,12 @@ program
             var extensions = options.minify == true ? "html,css,js".split(',') : options.minify.split(',');
 
             console.log('Exporting and minify current project, extensions %s', extensions);
-
-            cliHelper.cmdUnderConstruction();
         }
         else {
-            console.log('Exporting current project..');
-            cliHelper.cmdUnderConstruction();
+            //console.log('Exporting current project..');
         }
+
+        cliHelper.cmdUnderConstruction();
     }
 );
 

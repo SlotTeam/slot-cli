@@ -12,11 +12,12 @@ var path = require("path"),
 
 /**
  *
- * @param pathToResources   The full path were the slot-cli/resources folder has been created
- * @param projectFolder     The full path were the project folder has been created
- * @param page              The page name
+ * @param {string} pathToResources   Full path to the templates resources
+ * @param {string} projectFolder     Full path where the project folder has been created
+ * @param {string} page              The page name
+ * @param {Object} slotJson          JavaScript object that holds the 'slot.json' file config
  */
-function addPage(pathToResources, projectFolder, page, slotJson) {
+function addPage(pathToResources, projectFolder, page, slotJson, callback) {
 
     if (page.trim() != '') {
         pretty.doing("Adding new page '%s'", page);
@@ -27,17 +28,19 @@ function addPage(pathToResources, projectFolder, page, slotJson) {
         // Be sure the full-path folder is created.
         //
         mkdirp(path.join(projectFolder, path.join(slotJson.framework.webRootDir, folder)), function (err) {
-            if (err) console.error(err)
+            if (err)
+                callback(err); //console.error(err)
             else {
                 mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
                     if (err) {
-                        pretty.failed("Fail creating '%s'", page);
-                        throw err;
+                        /*pretty.failed("Fail creating '%s'", page);
+                        throw err;*/
+                        callback(err);
                     }
                     else {
-                        cliHelper.buildPage(pathToResources, projectFolder, page, slotJson);
+                        cliHelper.buildPage(pathToResources, projectFolder, page, slotJson, callback);
 
-                        pretty.done("Page '%s' created on '%s'", page, 'todo_path');
+                        pretty.done("Page '%s' created on '%s'", page/*, 'todo_path'*/);
                     }
                 });
             }
@@ -49,7 +52,14 @@ function addPage(pathToResources, projectFolder, page, slotJson) {
         pretty.alert('   To see help use: slot add -h');
     }
 }
-
+/**
+ *
+ * @param {string} pathToResources   Full path to the templates resources
+ * @param {string} projectFolder     Full path where the project folder has been created
+ * @param {string} fragment          Fragment name
+ * @param {Object} slotJson          JavaScript object that holds the 'slot.json' file config
+ * @param {string} slotJsonFile      Full path to 'slot.json'
+ */
 function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJsonFile) {
 
     if (fragment.trim() != '') {
@@ -96,9 +106,9 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
 
 /**
  *
- * @param pathToResources   The full path were the slot-cli/resources folder has been created
- * @param projectFolder     The full path were the project folder has been created
- * @param rest              The rest service name
+ * @param pathToResources   Full path to the templates resources
+ * @param projectFolder     Full path where the project folder has been created
+ * @param rest              Rest service name
  */
 function addRestService(pathToResources, projectFolder, rest, slotJson) {
 
