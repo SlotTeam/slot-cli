@@ -96,20 +96,15 @@ function buildResource(source, destiny, attrs, values, callback) {
     }
 
     // Write content on file
-    /*fs.writeFile(pathFile, content, function (err) {
-     if (err) throw err;
-     console.log('Saved resource on: %s', pathFile);
-     });*/
-    /*fs.writeFileSync(pathFile, content);
-
-    pretty.inform('Resource created on %s', pathFile);*/
-
     fs.writeFile(pathFile, content, function(err) {
+        if(!err)
+            pretty.inform('Resource created on %s', pathFile);
+
         //if(callback) {
             callback(err);
         //}
         //else
-        //    pretty.inform('X Resource created on %s', pathFile);
+        //    pretty.inform('Resource created on %s', pathFile);
     });
 }
 
@@ -142,13 +137,13 @@ function buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, c
         pageType = isHomePage ? projectFolder + pageType : page + pageType
         ;
 
-    // Create JSON bind file
+    // Create Meta-data binding file
     buildResource(path.join(pathToResources, "ref-page-bind.json")
         , path.join(path.join(projectFolder, slotJson.framework.metaData), page + ".json")
         , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
         , [page, nowTimeStamp, pageType, "Welcome to " + pageType]
         , function(err) {
-            if(!err)
+            if(err)
                 callback(false);
             else {
                 //Create HTML file
@@ -163,22 +158,31 @@ function buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, c
     );
 }
 
-function buildFragment(pathToResources, projectFolder, fragment, slotJson) {
+function buildFragment(pathToResources, projectFolder, fragment, slotJson, callback) {
 
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
         prefixedName = fragment.split('/').pop();
 
+    // Create Meta-data binding file
     buildResource(path.join(pathToResources, "ref-fragment-bind.json")
         , path.join(path.join(projectFolder, slotJson.framework.metaData), fragment + ".json")
         , ["fragmentID"]
         //, ['frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1))]
         , [prefixedName]
+        , function(err) {
+            if(err)
+                callback(false);
+            else {
+                //Create HTML file
+                buildResource(path.join(pathToResources, "ref-fragment.html")
+                    , path.join(path.join(projectFolder, slotJson.framework.fragmentRootDir), fragment + ".html")
+                    , ["fragment-name", "fragment-creation-date"]
+                    , [fragment, nowTimeStamp]
+                    , callback
+                );
+            }
+        }
     );
-
-    buildResource(path.join(pathToResources, "ref-fragment.html")
-        , path.join(path.join(projectFolder, slotJson.framework.fragmentRootDir), fragment + ".html")
-        , ["fragment-name", "fragment-creation-date"]
-        , [fragment, nowTimeStamp]);
 }
 
 function buildRestService(pathToResources, projectFolder, rest, slotJson) {

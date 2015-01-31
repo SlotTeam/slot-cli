@@ -17,7 +17,7 @@ var path = require("path"),
  * @param {string} page              The page name
  * @param {Object} slotJson          JavaScript object that holds the 'slot.json' file config
  * @param {boleean} isHomePage          JavaScript object that holds the 'slot.json' file config
- * @param callback
+ * @param {function} callback
  */
 function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, callback) {
 
@@ -49,6 +49,7 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, cal
         pretty.alert('   To see help use: slot add -h');
     }
 }
+
 /**
  *
  * @param {string} pathToResources   Full path to the templates resources
@@ -56,8 +57,9 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, cal
  * @param {string} fragment          Fragment name
  * @param {Object} slotJson          JavaScript object that holds the 'slot.json' file config
  * @param {string} slotJsonFile      Full path to 'slot.json'
+ * @param {function} callback
  */
-function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJsonFile) {
+function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJsonFile, callback) {
 
     if (fragment.trim() != '') {
         pretty.doing("Adding new fragment '%s' on '%s'", fragment, slotJson.framework.fragmentRootDir);
@@ -68,26 +70,33 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
         // Be sure the full-path folder is created.
         //
         mkdirp(path.join(projectFolder, path.join(slotJson.framework.fragmentRootDir, folder)), function (err) {
-            if (err) console.error(err)
+            if (err)
+                callback(err); //console.error(err)
             else {
                 mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
-                    if (err) console.error(err)
+                    if (err)
+                        callback(err);
                     else {
                         // Create fragment objects on file system
-                        cliHelper.buildFragment(pathToResources, projectFolder, fragment, slotJson);
+                        cliHelper.buildFragment(pathToResources, projectFolder, fragment, slotJson, function(err) {
+                            if (err)
+                                callback(err);
+                            else {
+                                // Add the newly created fragment on slot.json file
+                                var fragmentName = fragment.split('/').pop();
+                                slotJson.fragments[fragmentName] = '/' + fragment;
+                                slotJson.fragments = sortObj(slotJson.fragments);
+                                delete fragmentName;
 
-                        // Add the newly created fragment on slot.json file
-                        var fragmentName = fragment.split('/').pop();
-                        slotJson.fragments[fragmentName] = '/' + fragment;
-                        slotJson.fragments = sortObj(slotJson.fragments);
-                        delete fragmentName;
-
-                        fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
-                            if (err) {
-                                pretty.failed("Fail creating '%s'", fragment);
-                                throw err;
+                                fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
+                                    //if (err) {
+                                    //    pretty.failed("Fail creating '%s'", fragment);
+                                    //    throw err;
+                                    //}
+                                    //pretty.done("Fragment '%s' created on '%s'", fragment, 'todo_path');
+                                    callback(err)
+                                });
                             }
-                            pretty.done("Fragment '%s' created on '%s'", fragment, 'todo_path');
                         });
                     }
                 });

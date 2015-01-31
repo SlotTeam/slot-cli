@@ -21,6 +21,7 @@ var program = require('commander'),
     sortObj = require('sort-object'),
     cliHelper = require('./cliHelper'),
     cliActions = require('./cliActions'),
+    addCommand = require('./addCommand'),
     pretty = require('./prettyMessage'),
     pkg = require('../package.json');
 var slotJson,
@@ -45,7 +46,6 @@ program.command('create [project]')
     .description('Create a new project on folder [name]')
     //.option("-t, --theme [theme_id]", "Which theme_id to use in the project. It will install a predefined theme based on HTML5 frameworks like Bootstrap, Zurb, Kube.", null)
     //TODO: Complete the '-t, --theme' option
-
     .action(function (project) {
 
         if (project) {
@@ -164,18 +164,22 @@ program.command('create [project]')
                                                                                     /**
                                                                                      * Build project home page
                                                                                      */
-                                                                                    cliHelper.buildPage(pathToResources, project, "index", slotJson, true /*<<== isHomepage*/);
+                                                                                    cliHelper.buildPage(pathToResources, project, "index", slotJson
+                                                                                        , true /*<<== isHomepage*/
+                                                                                        , function () {
 
-                                                                                    /**
-                                                                                     * TODO:
-                                                                                     *  1.  After creation show a message saying:
-                                                                                     *      This project have been created with OneTheme, the oficial Bootstrap
-                                                                                     *      custom theme for Slot Framework. You can see full show case of OneTheme
-                                                                                     *      in:
-                                                                                     *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
-                                                                                     *
-                                                                                     *      Or describe any other theme the user has selected
-                                                                                     */
+                                                                                            /**
+                                                                                             * TODO:
+                                                                                             *  1.  After creation show a message saying:
+                                                                                             *      This project have been created with OneTheme, the oficial Bootstrap
+                                                                                             *      custom theme for Slot Framework. You can see full show case of OneTheme
+                                                                                             *      in:
+                                                                                             *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
+                                                                                             *
+                                                                                             *      Or describe any other theme the user has selected
+                                                                                             */
+                                                                                        }
+                                                                                    );
                                                                                 });
                                                                             });
                                                                         }
@@ -251,40 +255,47 @@ program.command('add')
     .option("-r, --rest [rest]", "Which rest service name to use", null)
     .action(function (options) {
 
-        //Validate that we are located on a valid slot project root directory
-        cliHelper.isValidRootDir(process.cwd()
-            , function (exists) {
-                // Load local slot configuration
-                slotJsonFile = path.join(process.cwd(), 'slot.json');
-                slotJson = require(slotJsonFile);
-                //
-                var pathToResources = path.join(path.join(__dirname, ".."), "resources");
+        ////Validate that we are located on a valid slot project root directory
+        //cliHelper.isValidRootDir(process.cwd()
+        //    , function (exists) {
+        //        // Load local slot configuration
+        //        slotJsonFile = path.join(process.cwd(), 'slot.json');
+        //        slotJson = require(slotJsonFile);
+        //        //
+        //        var pathToResources = path.join(path.join(__dirname, ".."), "resources");
+        //
+        //        if (options.fragment) {
+        //            cliActions.addFragment(pathToResources, process.cwd(), options.fragment, slotJson, slotJsonFile, function(err) {
+        //                if(err)
+        //                    pretty.failed("Fail creating fragment '%s'", options.fragment);
+        //                else
+        //                    pretty.done("Fragment '%s' created on '%s'", options.fragment/*, 'todo_path'*/, err);
+        //            });
+        //        }
+        //        else if (options.rest) {
+        //            cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson);
+        //        }
+        //        else if (options.page) {
+        //            cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, function(err) {
+        //                if(err)
+        //                    pretty.failed("Fail creating page '%s'", options.page);
+        //                else
+        //                    pretty.done("Page '%s' created on '%s'", options.page/*, 'todo_path'*/, err);
+        //            });
+        //        }
+        //        else {
+        //            pretty.alert();
+        //            pretty.alert("Please enter a valid command");
+        //            pretty.alert("   To see help use: slot add -h");
+        //        }
+        //    }
+        //    , function (exists) {
+        //        pretty.alert();
+        //        pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
+        //    }
+        //);
 
-                if (options.fragment) {
-                    cliActions.addFragment(pathToResources, process.cwd(), options.fragment, slotJson, slotJsonFile);
-                }
-                else if (options.rest) {
-                    cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson);
-                }
-                else if (options.page) {
-                    cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, function(err) {
-                        if(err)
-                            pretty.failed("Fail creating page '%s'", options.page);
-                        else
-                            pretty.done("Page '%s' created on '%s'", options.page/*, 'todo_path'*/, err);
-                    });
-                }
-                else {
-                    pretty.alert();
-                    pretty.alert("Please enter a valid command");
-                    pretty.alert("   To see help use: slot add -h");
-                }
-            }
-            , function (exists) {
-                pretty.alert();
-                pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
-            }
-        );
+        addCommand(options);
     }
 );
 
