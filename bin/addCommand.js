@@ -3,11 +3,7 @@
  */
 
 var program = require('commander'),
-    //os = require("os"),
-    //fs = require("fs"),
     path = require("path"),
-    //mkdirp = require('mkdirp'),
-    //sortObj = require('sort-object'),
     cliHelper = require('./cliHelper'),
     cliActions = require('./cliActions'),
     pretty = require('./prettyMessage');
@@ -30,18 +26,23 @@ function addCommand(options) {
                     if(err)
                         pretty.failed("Fail creating fragment '%s'", options.fragment);
                     else
-                        pretty.done("Fragment '%s' created on '%s'", options.fragment/*, 'todo_path'*/, err);
+                        pretty.done("Fragment '%s' was created", options.fragment);
                 });
             }
             else if (options.rest) {
-                cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson);
+                cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson, function(err) {
+                    if(err)
+                        pretty.failed("Fail creating rest service '%s'", options.rest);
+                    else
+                        pretty.done("Rest service '%s' was created", options.rest);
+                });
             }
             else if (options.page) {
                 cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, function(err) {
                     if(err)
                         pretty.failed("Fail creating page '%s'", options.page);
                     else
-                        pretty.done("Page '%s' created on '%s'", options.page/*, 'todo_path'*/, err);
+                        pretty.done("Page '%s' was created", options.page);
                 });
             }
             else {

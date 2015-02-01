@@ -14,14 +14,10 @@
  */
 
 var program = require('commander'),
-    os = require("os"),
-    fs = require("fs"),
     path = require("path"),
-    mkdirp = require('mkdirp'),
-    sortObj = require('sort-object'),
     cliHelper = require('./cliHelper'),
-    cliActions = require('./cliActions'),
     addCommand = require('./addCommand'),
+    createCommand = require('./createCommand'),
     pretty = require('./prettyMessage'),
     pkg = require('../package.json');
 var slotJson,
@@ -43,170 +39,15 @@ program.command('*')
     });
 
 program.command('create [project]')
-    .description('Create a new project on folder [name]')
+    .description('Creates a new project on folder [name]')
     //.option("-t, --theme [theme_id]", "Which theme_id to use in the project. It will install a predefined theme based on HTML5 frameworks like Bootstrap, Zurb, Kube.", null)
-    //TODO: Complete the '-t, --theme' option
     .action(function (project) {
 
-        if (project) {
-            //Validate that we are not located on a valid slot project
-            cliHelper.isValidRootDir(process.cwd()
-                , function (exists) {
-                    pretty.alert();
-                    pretty.alert("It appears that you are located on a valid slot project, you can't execute 'create command' inside an existing slot project.");
-                }
-                , function (exists) {
-                    slotJson = require('../slot.json');
-                    slotJsonFile = path.join(process.cwd(), 'slot.json');
-
-                    pretty.doing("Creating '%s' project!", project);
-
-                    mkdirp(project, function (err) {
-                        if (err) {
-                            pretty.failed("Fail creating '%s'", project);
-                            throw err;
-                        }
-                        else {
-                            pretty.doing("creating metaData folder");
-
-                            mkdirp(path.join(project, slotJson.framework.metaData), function (err) {
-                                if (err) {
-                                    pretty.fail("Fail creating meta-data layer folder");
-                                    throw err;
-                                }
-                                else {
-                                    pretty.doing("creating fragmentRootDir folder");
-
-                                    mkdirp(path.join(project, slotJson.framework.fragmentRootDir), function (err) {
-                                        if (err) {
-                                            pretty.fail("Fail creating Fragments layer folder");
-                                            throw err;
-                                        }
-                                        else {
-                                            pretty.doing("creating webRootDir folder");
-
-                                            mkdirp(path.join(project, slotJson.framework.webRootDir), function (err) {
-                                                if (err) {
-                                                    pretty.fail("Fail creating Web root folder");
-                                                    throw err;
-                                                }
-                                                else {
-                                                    pretty.doing("creating mvcRootDir folder");
-
-                                                    mkdirp(path.join(project, slotJson.framework.mvcRootDir), function (err) {
-                                                        if (err) {
-                                                            pretty.fail("Fail creating REST layer folder");
-                                                            throw err;
-                                                        }
-                                                        else {
-                                                            pretty.doing("creating restRootDir folder");
-
-                                                            mkdirp(path.join(project, slotJson.framework.restRootDir), function (err) {
-                                                                if (err) {
-                                                                    pretty.fail("Fail creating REST layer folder");
-                                                                    throw err;
-                                                                }
-                                                                else {
-                                                                    pretty.doing("creating dbRootDir folder");
-
-                                                                    mkdirp(path.join(project, slotJson.framework.dbRootDir), function (err) {
-                                                                        if (err) {
-                                                                            pretty.fail("Fail creating DB layer folder");
-                                                                            throw err;
-                                                                        }
-                                                                        else {
-                                                                            pretty.inform("Running on  " + __dirname);
-
-                                                                            var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-                                                                            pretty.inform("Resources folder " + pathToResources);
-
-                                                                            /**
-                                                                             * Create slot.json file
-                                                                             */
-                                                                            var content = fs.readFileSync(path.join(pathToResources, "ref-slot.json"), 'binary'),
-                                                                                pathFile = path.join(project, "slot.json");
-                                                                            //
-                                                                            /**
-                                                                             * TODO:
-                                                                             *  1.  Evaluate if creating a new project using -T option deserve to add basic fragments
-                                                                             *      in the fragments section.
-                                                                             */
-                                                                            content = content.replace("{@fragments@}", "");
-                                                                            //
-                                                                            fs.writeFile(pathFile, content, function (err) {
-                                                                                if (err) {
-                                                                                    pretty.fail("Fail creating slot.json file on: %s", pathFile);
-                                                                                    throw err;
-                                                                                }
-                                                                                pretty.inform("Saved slot.json on: &s", pathFile);
-
-                                                                                /**
-                                                                                 * Create package.json file
-                                                                                 */
-                                                                                content = fs.readFileSync(path.join(pathToResources, "ref-package.json"), 'binary');
-                                                                                pathFile = path.join(project, "package.json");
-                                                                                //
-                                                                                content = content
-                                                                                    .replace("{@name@}", project)
-                                                                                    .replace("{@license@}", "MIT");
-                                                                                //
-                                                                                fs.writeFile(pathFile, content, function (err) {
-                                                                                    if (err) throw err;
-                                                                                    pretty.inform("Saved package.json on: " + pathFile);
-
-                                                                                    /**
-                                                                                     * Execute 'npm install' to build all dependencies
-                                                                                     */
-                                                                                    cliHelper.npmInstall(project);
-
-                                                                                    cliHelper.buildServers(pathToResources, project);
-
-                                                                                    /**
-                                                                                     * Build project home page
-                                                                                     */
-                                                                                    cliHelper.buildPage(pathToResources, project, "index", slotJson
-                                                                                        , true /*<<== isHomepage*/
-                                                                                        , function () {
-
-                                                                                            /**
-                                                                                             * TODO:
-                                                                                             *  1.  After creation show a message saying:
-                                                                                             *      This project have been created with OneTheme, the oficial Bootstrap
-                                                                                             *      custom theme for Slot Framework. You can see full show case of OneTheme
-                                                                                             *      in:
-                                                                                             *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
-                                                                                             *
-                                                                                             *      Or describe any other theme the user has selected
-                                                                                             */
-                                                                                        }
-                                                                                    );
-                                                                                });
-                                                                            });
-                                                                        }
-                                                                    });
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            );
-        }
-        else {
-            pretty.alert();
-            pretty.alert("Please enter a project name");
-        }
+        createCommand(project);
     });
 
 program.command('start')
-    .description('Start servers on current slot project, without parameters, it starts the designer server by default')
+    .description('Starts servers on current slot project, without parameters, it starts the designer server by default')
     //.option("-p, --port [port]", "specify the port [3000]", /*Number,*/ 3000)
     .option("-s, --design", "Start the designer server on current project")
     .option("-d, --develop", "Start the development server on current project")
@@ -249,51 +90,11 @@ program.command('start')
 );
 
 program.command('add')
-    .description('Add a new object to current slot project')
+    .description('Adds a new object to current slot project')
     .option("-p, --page [page]", "Which page name to use", null)
     .option("-f, --fragment [fragment]", "Which fragment name to use", null)
     .option("-r, --rest [rest]", "Which rest service name to use", null)
     .action(function (options) {
-
-        ////Validate that we are located on a valid slot project root directory
-        //cliHelper.isValidRootDir(process.cwd()
-        //    , function (exists) {
-        //        // Load local slot configuration
-        //        slotJsonFile = path.join(process.cwd(), 'slot.json');
-        //        slotJson = require(slotJsonFile);
-        //        //
-        //        var pathToResources = path.join(path.join(__dirname, ".."), "resources");
-        //
-        //        if (options.fragment) {
-        //            cliActions.addFragment(pathToResources, process.cwd(), options.fragment, slotJson, slotJsonFile, function(err) {
-        //                if(err)
-        //                    pretty.failed("Fail creating fragment '%s'", options.fragment);
-        //                else
-        //                    pretty.done("Fragment '%s' created on '%s'", options.fragment/*, 'todo_path'*/, err);
-        //            });
-        //        }
-        //        else if (options.rest) {
-        //            cliActions.addRestService(pathToResources, process.cwd(), options.rest, slotJson);
-        //        }
-        //        else if (options.page) {
-        //            cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, function(err) {
-        //                if(err)
-        //                    pretty.failed("Fail creating page '%s'", options.page);
-        //                else
-        //                    pretty.done("Page '%s' created on '%s'", options.page/*, 'todo_path'*/, err);
-        //            });
-        //        }
-        //        else {
-        //            pretty.alert();
-        //            pretty.alert("Please enter a valid command");
-        //            pretty.alert("   To see help use: slot add -h");
-        //        }
-        //    }
-        //    , function (exists) {
-        //        pretty.alert();
-        //        pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
-        //    }
-        //);
 
         addCommand(options);
     }

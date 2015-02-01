@@ -25,7 +25,7 @@ var run = function (cmd, callback) {
         if (error !== null) {
             console.log('' + error);
         }*/
-        //callback();
+        callback(error, stdout, stderr);
     });
 };
 
@@ -41,24 +41,20 @@ function isValidRootDir(dirPath, onExists, onDontExists) {
     });
 }
 
-function npmInstall(project) {
+function npmInstall(project, callback) {
 
     if (project.trim() != '') {
+        pretty.doing("Installing npm dependencies..");
 
         var current = process.cwd(),
             folder = path.join(process.cwd(), project);
 
-        pretty.doing("Installing new project '%s'", folder);
         process.chdir(folder);
-
-        /**
-         * Execute npm install for all dependencies..
-         */
-        run('npm install' /*, function() {
-         }*/);
-
-        pretty.done("Project '%s' installed on '%s'", project, folder);
-        process.chdir(current);
+        // Execute npm install for all dependencies..
+        run('npm install' , function(error, stdout, stderr) {
+            process.chdir(current);
+            callback(error, stdout, error);
+        });
     }
     else {
         pretty.alert("Please enter a valid project name");
@@ -108,24 +104,29 @@ function buildResource(source, destiny, attrs, values, callback) {
     });
 }
 
-function buildServers(pathToResources, projectFolder) {
+function buildServers(pathToResources, projectFolder, callback) {
 
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
 
     mkdirp(path.join(projectFolder, "server"), function (err) {
-        if (err) console.error(err)
+        if (err)
+            callback(err);  //console.error(err)
         else {
             pretty.doing("Creating servers..");
 
             buildResource(path.join(pathToResources, "ref-designerServer.js")
                 , path.join(path.join(projectFolder, "server"), "designer.js")
                 , ["page-creation-date"]
-                , [nowTimeStamp]);
-
-            buildResource(path.join(pathToResources, "ref-developerServer.js")
-                , path.join(path.join(projectFolder, "server"), "developer.js")
-                , ["page-creation-date"]
-                , [nowTimeStamp]);
+                , [nowTimeStamp]
+                , function(err) {
+                    buildResource(path.join(pathToResources, "ref-developerServer.js")
+                        , path.join(path.join(projectFolder, "server"), "developer.js")
+                        , ["page-creation-date"]
+                        , [nowTimeStamp]
+                        , callback
+                    );
+                }
+            );
         }
     });
 }
@@ -185,14 +186,17 @@ function buildFragment(pathToResources, projectFolder, fragment, slotJson, callb
     );
 }
 
-function buildRestService(pathToResources, projectFolder, rest, slotJson) {
+function buildRestService(pathToResources, projectFolder, rest, slotJson, callback) {
 
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString();
 
+    // Create JS file
     buildResource(path.join(pathToResources, "ref-rest-service.js")
         , path.join(path.join(projectFolder, slotJson.framework.restRootDir), rest + ".js")
         , ["rest-name", "rest-url", "pc-machine", "creation-date"]
-        , [rest.split('/').pop(), "http://<server>:<port>/rest/" + rest, os.hostname, nowTimeStamp]);
+        , [rest.split('/').pop(), "http://<server>:<port>/rest/" + rest, os.hostname, nowTimeStamp]
+        , callback
+    );
 }
 
 

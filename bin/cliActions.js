@@ -112,11 +112,12 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
 
 /**
  *
- * @param pathToResources   Full path to the templates resources
- * @param projectFolder     Full path where the project folder has been created
- * @param rest              Rest service name
+ * @param {string} pathToResources   Full path to the templates resources
+ * @param {string} projectFolder     Full path where the project folder has been created
+ * @param {string} rest              Rest service name
+ * @param {function} callback
  */
-function addRestService(pathToResources, projectFolder, rest, slotJson) {
+function addRestService(pathToResources, projectFolder, rest, slotJson, callback) {
 
     if (rest.trim() != '') {
         pretty.doing("Adding new rest service '%s'", rest);
@@ -127,14 +128,10 @@ function addRestService(pathToResources, projectFolder, rest, slotJson) {
         // Be sure the full-path folder is created.
         //
         mkdirp(path.join(projectFolder, path.join(slotJson.framework.restRootDir, folder)), function (err) {
-            if (err) {
-                pretty.failed("Fail creating '%s'", rest);
-                throw err;
-            }
+            if (err)
+                callback(err); //console.error(err)
             else {
-                cliHelper.buildRestService(pathToResources, projectFolder, rest, slotJson);
-
-                pretty.done("Rest service '%s' created on '%s'", rest, 'todo_path');
+                cliHelper.buildRestService(pathToResources, projectFolder, rest, slotJson, callback);
             }
         });
     }
