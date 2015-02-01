@@ -64,8 +64,8 @@ function npmInstall(project, callback) {
 
 function cmdUnderConstruction() {
     pretty.alert();
-    pretty.alert(" * This command option is under construction, we are * ");
-    pretty.alert(" * working hard to release as soon as possible.. :-) * ");
+    pretty.alert("This command option is under construction, we are * ");
+    pretty.alert("working hard to release as soon as possible.. :-) * ");
     pretty.alert();
 }
 
@@ -96,11 +96,7 @@ function buildResource(source, destiny, attrs, values, callback) {
         if(!err)
             pretty.inform('Resource created on %s', pathFile);
 
-        //if(callback) {
-            callback(err);
-        //}
-        //else
-        //    pretty.inform('Resource created on %s', pathFile);
+        callback(err);
     });
 }
 

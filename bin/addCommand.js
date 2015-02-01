@@ -2,8 +2,7 @@
  * Created by cecheveria on 1/31/2015.
  */
 
-var program = require('commander'),
-    path = require("path"),
+var path = require("path"),
     cliHelper = require('./cliHelper'),
     cliActions = require('./cliActions'),
     pretty = require('./prettyMessage');
