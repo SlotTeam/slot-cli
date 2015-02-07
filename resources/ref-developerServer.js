@@ -6,4 +6,4 @@ var server = require('slot-framework')
     ;
 
 //server.setDevMode(false);
-server.start(/* Default port 801 */);
+server.start(/* Default port 801 */ 2001);

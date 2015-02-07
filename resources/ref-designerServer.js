@@ -5,4 +5,4 @@
 var designerServer = require('slot-framework').Designer
     ;
 
-designerServer.start(/* Default port 800 */);
+designerServer.start(/* Default port 800 */ 2000 );

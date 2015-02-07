@@ -1,0 +1,97 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node',
+1 verbose cli   '/usr/bin/npm',
+1 verbose cli   'publish',
+1 verbose cli   '--tag',
+1 verbose cli   'v0.0.16-alpha' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.36
+4 verbose node symlink /usr/bin/node
+5 verbose publish [ '.' ]
+6 verbose cache add [ '.', null ]
+7 verbose cache add name=undefined spec="." args=[".",null]
+8 verbose parsed url { protocol: null,
+8 verbose parsed url   slashes: null,
+8 verbose parsed url   auth: null,
+8 verbose parsed url   host: null,
+8 verbose parsed url   port: null,
+8 verbose parsed url   hostname: null,
+8 verbose parsed url   hash: null,
+8 verbose parsed url   search: null,
+8 verbose parsed url   query: null,
+8 verbose parsed url   pathname: '.',
+8 verbose parsed url   path: '.',
+8 verbose parsed url   href: '.' }
+9 silly lockFile 3a52ce78- .
+10 verbose lock . /home/cecheverria/.npm/3a52ce78-.lock
+11 verbose tar pack [ '/home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package.tgz',
+11 verbose tar pack   '.' ]
+12 verbose tarball /home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package.tgz
+13 verbose folder .
+14 info prepublish slot-cli@0.0.16-alpha.1
+15 silly lockFile 1f1177db-tar tar://.
+16 verbose lock tar://. /home/cecheverria/.npm/1f1177db-tar.lock
+17 silly lockFile 260bbe0b-t-cli-0-0-16-alpha-1-package-tgz tar:///home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package.tgz
+18 verbose lock tar:///home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package.tgz /home/cecheverria/.npm/260bbe0b-t-cli-0-0-16-alpha-1-package-tgz.lock
+19 silly lockFile 1f1177db-tar tar://.
+20 silly lockFile 1f1177db-tar tar://.
+21 silly lockFile 260bbe0b-t-cli-0-0-16-alpha-1-package-tgz tar:///home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package.tgz
+22 silly lockFile 260bbe0b-t-cli-0-0-16-alpha-1-package-tgz tar:///home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package.tgz
+23 silly lockFile b8100b33--slot-cli-0-0-16-alpha-1-package /home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package
+24 verbose lock /home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package /home/cecheverria/.npm/b8100b33--slot-cli-0-0-16-alpha-1-package.lock
+25 silly lockFile b8100b33--slot-cli-0-0-16-alpha-1-package /home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package
+26 silly lockFile b8100b33--slot-cli-0-0-16-alpha-1-package /home/cecheverria/.npm/slot-cli/0.0.16-alpha.1/package
+27 silly lockFile 3a52ce78- .
+28 silly lockFile 3a52ce78- .
+29 silly publish { name: 'slot-cli',
+29 silly publish   version: '0.0.16-alpha.1',
+29 silly publish   description: 'Command line, a friendly tool for easy handle Slot Framework projects (manage projects, fragments and REST services)',
+29 silly publish   keywords:
+29 silly publish    [ 'framework',
+29 silly publish      'web',
+29 silly publish      'development',
+29 silly publish      'slot',
+29 silly publish      'fragment',
+29 silly publish      'bootstrap',
+29 silly publish      'zurb',
+29 silly publish      'jquery',
+29 silly publish      'html',
+29 silly publish      'html5',
+29 silly publish      'css' ],
+29 silly publish   author:
+29 silly publish    { name: 'Carlos Echeverría',
+29 silly publish      email: 'SlotFramework@gmail.com',
+29 silly publish      url: 'https://github.com/cecheverria' },
+29 silly publish   contributors: [],
+29 silly publish   licenses:
+29 silly publish    [ { type: 'MIT',
+29 silly publish        url: 'https://github.com/SlotTeam/slot-cli/blob/master/LICENSE' } ],
+29 silly publish   repository: { type: 'git', url: 'https://github.com/SlotTeam/slot-cli.git' },
+29 silly publish   dependencies:
+29 silly publish    { colors: '^0.6.2',
+29 silly publish      commander: '>=1.0.0',
+29 silly publish      mkdirp: '0.3.5',
+29 silly publish      'slot-framework': '>= 0.0.1',
+29 silly publish      'sort-object': '^0.3.2',
+29 silly publish      string: '^2.0.0' },
+29 silly publish   engines: { node: '>= 0.10.0' },
+29 silly publish   main: 'index',
+29 silly publish   homepage: 'http://www.slotframework.org/',
+29 silly publish   bin: { slot: 'bin/slot-cli.js' },
+29 silly publish   readme: '[![NPM version](https://badge.fury.io/js/slot-cli.svg)](http://badge.fury.io/js/slot-cli)\n[![GitHub version](https://badge.fury.io/gh/SlotTeam%2Fslot-cli.svg)](http://badge.fury.io/gh/SlotTeam%2Fslot-cli)\n\n# [Slot Command Line Interface](http://www.SlotFramework.org/docs)\n\n> The official Slot Command-Line Interface, a friendly tool for easy handle Slot Framework projects (manage projects, fragments, REST services and Html5 Themes), \n see more at [Slot CLI Docs](http://www.SlotFramework.org/docs).\n\n\nslot -h \n=======\n    $ slot -h\n      Usage: slot-cli [options] [command]\n\n      Commands:\n\n        *\n\n        create [project]\n           Create a new project on folder [name]\n\n        start [options]\n           Start servers on current slot project, without parameters, it starts the designer server by default\n\n        add [options]\n           Add a new object to current slot project\n\n\n        Options:\n          \n          -h, --help     output usage information\n          -V, --version  output the version number\n\n\n\nslot create -h\n==============\n    $ slot create -h\n      Usage: create [options] [project]\n    \n      Options:\n    \n        -t, --theme [theme]          Which theme_id to use\n        -h, --help  output usage information\n\n\n\nslot add -h\n===========\n    $ slot add -h\n      Usage: add [options]\n    \n      Options:\n    \n        -h, --help                 output usage information\n        -p, --page [page]          Which page name to use\n        -f, --fragment [fragment]  Which fragment name to use\n        -r, --rest [rest]          Which rest service name to use\n\n\n\nslot start -h\n=============\n    $ slot start -h\n      Usage: start [options]\n    \n      Options:\n    \n        -h, --help     output usage information\n        -s, --design   Start the designer server on current slot project\n        -d, --develop  Start the development server on current slot project\n        -a, --all      Start designer and development server on current slot project\n',
+29 silly publish   readmeFilename: 'README.md',
+29 silly publish   gitHead: '9162d1ba1cc2e662327771f973511fd6a45e59ea',
+29 silly publish   bugs: { url: 'https://github.com/SlotTeam/slot-cli/issues' },
+29 silly publish   _id: 'slot-cli@0.0.16-alpha.1',
+29 silly publish   scripts: {},
+29 silly publish   _shasum: 'dcb0fa0419eea8b5efc6149e5f81cc1d332628f0',
+29 silly publish   _from: '.' }
+30 error need auth auth and email required for publishing
+30 error need auth You need to authorize this machine using `npm adduser`
+31 error System Linux 3.2.0-76-generic
+32 error command "/usr/bin/node" "/usr/bin/npm" "publish" "--tag" "v0.0.16-alpha"
+33 error cwd /home/cecheverria/c/datadrive/workspaces/Webstorm/gCloud/slot-cli
+34 error node -v v0.10.36
+35 error npm -v 1.4.28
+36 error code ENEEDAUTH
+37 verbose exit [ 1, true ]
