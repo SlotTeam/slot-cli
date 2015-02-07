@@ -12,7 +12,6 @@
  *
  * @type {exports}
  */
-
 var program = require('commander'),
     createCommand = require('./createCommand'),
     addCommand = require('./addCommand'),
@@ -21,7 +20,7 @@ var program = require('commander'),
     pretty = require('./prettyMessage'),
     pkg = require('../package.json');
 
-// Set command line version
+// Get version number from package.json file
 program.version(pkg.version);
 
 /**
