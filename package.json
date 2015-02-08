@@ -1,6 +1,6 @@
 {
   "name": "slot-cli",
-  "version": "0.0.16-alpha.2",
+  "version": "0.0.16-alpha.2x",
   "description": "Command line, a friendly tool for easy handle Slot Framework projects (manage projects, fragments and REST services)",
   "keywords": [
     "framework",
@@ -35,7 +35,7 @@
     "colors": "^0.6.2",
     "commander": ">=1.0.0",
     "mkdirp": "0.3.5",
-    "slot-framework": ">= 0.0.1",
+    "slot-framework": ">= 0.0.15-alpha",
     "sort-object": "^0.3.2",
     "string": "^2.0.0"
   },
