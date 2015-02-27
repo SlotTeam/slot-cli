@@ -6,7 +6,7 @@ var colors = require('colors'),
     S = require('string')
     ;
 
-var PrettyrMsg = (function() {
+var PrettyMsg = (function() {
     function PrettyMessage() {
 
     }
@@ -53,4 +53,4 @@ var PrettyrMsg = (function() {
 })();
 
 // Export main object
-module.exports = PrettyrMsg;
+module.exports = PrettyMsg;
