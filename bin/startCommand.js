@@ -16,6 +16,23 @@ function startCommand(options) {
             slotJsonFile = path.join(process.cwd(), 'slot.json');
             slotJson = require(slotJsonFile);
             //
+
+            /**
+             * TODO:
+             *  1. Take require('slot-framework') from the project folder, we are going
+             *     to remove the 'slot-framework' from the command line dependencies.
+             *     This is going to warranty always we will be working whit the Slot version
+             *     installed on the local project.
+             *
+             *     a.   The proposed code change is:
+             *          var development = require(path.join(process.cwd(), 'slot-framework'));
+             *
+             *     b.   Validate that path.join(process.cwd(), 'slot-framework') exists.
+             *          If not, we need to show an alert message.
+             *
+             *  2. Add code section to start the 'Grunt Watcher', it will contain all the
+             *     necessary services to automate 'building tasks' in the framework.
+             */
             var development = require('slot-framework'),
                 designer = development.Designer;
 
