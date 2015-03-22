@@ -31,7 +31,7 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, cal
         //
         mkdirp(path.join(projectFolder, path.join(slotJson.framework.webRootDir, folder)), function (err) {
             if (err)
-                callback(err); //console.error(err)
+                callback(err);
             else {
                 mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
                     if (err)
