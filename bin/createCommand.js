@@ -141,10 +141,11 @@ function createCommand(project) {
                                                                                                 else {
                                                                                                     pretty.done("Servers were created");
 
-                                                                                                    pretty.doing("Setting up Automation Services.. " +
-                                                                                                        (path.join(project, "node_modules/slot-framework/Gruntfile.js"))
-                                                                                                        + " " +
-                                                                                                        (path.join(project, "Gruntfile.js"))
+                                                                                                    pretty.doing("Setting up Automation Services.. "
+                                                                                                        //+
+                                                                                                        //(path.join(project, "node_modules/slot-framework/Gruntfile.js"))
+                                                                                                        //+ " " +
+                                                                                                        //(path.join(project, "Gruntfile.js"))
                                                                                                     );
 
                                                                                                     fs.rename(

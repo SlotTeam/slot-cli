@@ -47,6 +47,7 @@ program.command('start')
     .option("-s, --design", "Start the designer server on current project")
     .option("-d, --develop", "Start the development server on current project")
     .option("-a, --all", "Start designer and development server on current project")
+    .option("-w, --watch", "Start designer and development server on current project")
     .action(function (options) {
 
         startCommand(options);

@@ -33,7 +33,8 @@ function startCommand(options) {
              *  2. Add code section to start the 'Grunt Watcher', it will contain all the
              *     necessary services to automate 'building tasks' in the framework.
              */
-            var development = require('slot-framework'),
+            //var development = require('slot-framework'),
+            var development = require(path.join(process.cwd(), 'node_modules/slot-framework')),
                 designer = development.Designer;
 
             if (options.develop) {
@@ -44,6 +45,19 @@ function startCommand(options) {
             }
             else if (options.port) {
                 cliHelper.cmdUnderConstruction()
+            }
+            else if (options.watch) {
+                cliHelper.run('grunt', function(error, stdout, stderr){
+                    if (stderr !== null) {
+                        console.log('' + stderr);
+                    }
+                    if (stdout !== null) {
+                        console.log('' + stdout);
+                    }
+                    if (error !== null) {
+                        console.log('' + error);
+                    }
+                })
             }
             else if (options.design || (!options.develop && !options.design && !options.all && !options.port)) {
                 designer.start();
@@ -57,6 +71,7 @@ function startCommand(options) {
         , function (exists) {
             pretty.alert();
             pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
+            pretty.alert();
         }
     );
 }
