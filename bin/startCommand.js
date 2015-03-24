@@ -41,23 +41,48 @@ function startCommand(options) {
                 development.start();
             }
             else if (options.all) {
-                cliHelper.cmdUnderConstruction()
+                //cliHelper.cmdUnderConstruction()
+
+                //Start Automated Build Services
+                var fs = require('fs'),
+                    spawn = require('child_process').spawn,
+                    out = fs.openSync('./auto.log', 'a'),
+                    err = fs.openSync('./auto.log', 'a');
+
+                spawn('grunt', [/*'args'*/], {
+                    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
+                    detached: true
+                }).unref();
+
+                //Start Designer Server
+                var fs = require('fs'),
+                    spawn = require('child_process').spawn,
+                    out = fs.openSync('./designer.log', 'a'),
+                    err = fs.openSync('./designer.log', 'a');
+
+                spawn('slot', ['start', '-s'], {
+                    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
+                    detached: true
+                }).unref();
+
+                //Start Development Server
+                development.start();
             }
             else if (options.port) {
                 cliHelper.cmdUnderConstruction()
             }
             else if (options.watch) {
-                cliHelper.run('grunt', function(error, stdout, stderr){
-                    if (stderr !== null) {
-                        console.log('' + stderr);
-                    }
-                    if (stdout !== null) {
-                        console.log('' + stdout);
-                    }
-                    if (error !== null) {
-                        console.log('' + error);
-                    }
-                })
+
+                var fs = require('fs'),
+                    spawn = require('child_process').spawn,
+                    out = fs.openSync('./auto.log', 'a'),
+                    err = fs.openSync('./auto.log', 'a');
+
+                spawn('grunt', [/*'args'*/], {
+                    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
+                    detached: true
+                }).unref();
+
             }
             else if (options.design || (!options.develop && !options.design && !options.all && !options.port)) {
                 designer.start();
