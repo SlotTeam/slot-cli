@@ -29,6 +29,29 @@ var run = function (cmd, callback) {
     });
 };
 
+function nohup(command, arguments, logFile) {
+
+    //var fs = require('fs'),
+    //    spawn = require('child_process').spawn,
+    //    out = fs.openSync('./auto.log', 'a'),
+    //    err = fs.openSync('./auto.log', 'a');
+    //
+    //spawn('grunt', [/*'args'*/], {
+    //    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
+    //    detached: true
+    //}).unref();
+
+    var fs = require('fs'),
+        spawn = require('child_process').spawn,
+        out = fs.openSync(logFile, 'a'),
+        err = fs.openSync(logFile, 'a');
+
+    spawn(command, arguments, {
+        stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
+        detached: true
+    }).unref();
+}
+
 function isValidRootDir(dirPath, onExists, onDontExists) {
 
     var slotJsonFile = path.join(dirPath, 'slot.json');
@@ -197,6 +220,7 @@ function buildRestService(pathToResources, projectFolder, rest, slotJson, callba
 
 
 module.exports.run = run;
+module.exports.nohup = nohup;
 module.exports.isValidRootDir = isValidRootDir;
 module.exports.npmInstall = npmInstall;
 module.exports.cmdUnderConstruction = cmdUnderConstruction;

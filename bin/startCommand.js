@@ -15,24 +15,7 @@ function startCommand(options) {
             // Load local slot configuration
             slotJsonFile = path.join(process.cwd(), 'slot.json');
             slotJson = require(slotJsonFile);
-            //
 
-            /**
-             * TODO:
-             *  1. Take require('slot-framework') from the project folder, we are going
-             *     to remove the 'slot-framework' from the command line dependencies.
-             *     This is going to warranty always we will be working whit the Slot version
-             *     installed on the local project.
-             *
-             *     a.   The proposed code change is:
-             *          var development = require(path.join(process.cwd(), 'slot-framework'));
-             *
-             *     b.   Validate that path.join(process.cwd(), 'slot-framework') exists.
-             *          If not, we need to show an alert message.
-             *
-             *  2. Add code section to start the 'Grunt Watcher', it will contain all the
-             *     necessary services to automate 'building tasks' in the framework.
-             */
             //var development = require('slot-framework'),
             var development = require(path.join(process.cwd(), 'node_modules/slot-framework')),
                 designer = development.Designer;
@@ -40,52 +23,24 @@ function startCommand(options) {
             if (options.develop) {
                 development.start();
             }
-            else if (options.all) {
-                //cliHelper.cmdUnderConstruction()
-
-                //Start Automated Build Services
-                var fs = require('fs'),
-                    spawn = require('child_process').spawn,
-                    out = fs.openSync('./auto.log', 'a'),
-                    err = fs.openSync('./auto.log', 'a');
-
-                spawn('grunt', [/*'args'*/], {
-                    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
-                    detached: true
-                }).unref();
-
-                //Start Designer Server
-                var fs = require('fs'),
-                    spawn = require('child_process').spawn,
-                    out = fs.openSync('./designer.log', 'a'),
-                    err = fs.openSync('./designer.log', 'a');
-
-                spawn('slot', ['start', '-s'], {
-                    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
-                    detached: true
-                }).unref();
-
-                //Start Development Server
-                development.start();
+            else if (options.design) {
+                designer.start();
+            }
+            else if (options.watch) {
+                cliHelper.nohup('grunt', [], './logs/auto.log');
             }
             else if (options.port) {
                 cliHelper.cmdUnderConstruction()
             }
-            else if (options.watch) {
+            else if (!options.develop && !options.design && !options.all && !options.port) {
+                //Start Designer Server
+                cliHelper.nohup('slot', ['start', '-s'], './logs/designer.log');
 
-                var fs = require('fs'),
-                    spawn = require('child_process').spawn,
-                    out = fs.openSync('./auto.log', 'a'),
-                    err = fs.openSync('./auto.log', 'a');
+                //Start Automated Build Services
+                cliHelper.nohup('grunt', [], './logs/auto.log');
 
-                spawn('grunt', [/*'args'*/], {
-                    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
-                    detached: true
-                }).unref();
-
-            }
-            else if (options.design || (!options.develop && !options.design && !options.all && !options.port)) {
-                designer.start();
+                //Start Development Server
+                development.start();
             }
             else {
                 pretty.alert();

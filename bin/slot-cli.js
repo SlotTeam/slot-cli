@@ -46,8 +46,7 @@ program.command('start')
     .description('Starts servers on current slot project, without parameters, it starts the designer server by default')    //.option("-p, --port [port]", "specify the port [3000]", /*Number,*/ 3000)
     .option("-s, --design", "Start the designer server on current project")
     .option("-d, --develop", "Start the development server on current project")
-    .option("-a, --all", "Start designer and development server on current project")
-    .option("-w, --watch", "Start designer and development server on current project")
+    .option("-w, --watch", "Start automated build services on current project")
     .action(function (options) {
 
         startCommand(options);
