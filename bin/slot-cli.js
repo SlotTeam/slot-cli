@@ -44,14 +44,20 @@ program.command('create [project]')
 
 program.command('start')
     .description('Starts servers on current slot project, without parameters, it starts the designer server by default')    //.option("-p, --port [port]", "specify the port [3000]", /*Number,*/ 3000)
-    .option("-s, --design", "Start the designer server on current project")
+    .option("-m, --design", "Start the designer server on current project")
     .option("-d, --develop", "Start the development server on current project")
     .option("-w, --watch", "Start automated build services on current project")
+    .option("-s, --silent", "Start the services on silent mode")
     .action(function (options) {
 
         startCommand(options);
     }
 );
+
+/**
+ * TODO:
+ *  1.  Implement Stop command
+ */
 
 program.command('add')
     .description('Adds a new object to current slot project')

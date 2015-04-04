@@ -31,16 +31,6 @@ var run = function (cmd, callback) {
 
 function nohup(command, arguments, logFile) {
 
-    //var fs = require('fs'),
-    //    spawn = require('child_process').spawn,
-    //    out = fs.openSync('./auto.log', 'a'),
-    //    err = fs.openSync('./auto.log', 'a');
-    //
-    //spawn('grunt', [/*'args'*/], {
-    //    stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
-    //    detached: true
-    //}).unref();
-
     var fs = require('fs'),
         spawn = require('child_process').spawn,
         out = fs.openSync(logFile, 'a'),

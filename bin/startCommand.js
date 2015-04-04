@@ -21,10 +21,18 @@ function startCommand(options) {
                 designer = development.Designer;
 
             if (options.develop) {
-                development.start();
+                if(options.silent)
+                    //Start Development Server in silent mode
+                    cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
+                else
+                    development.start();
             }
             else if (options.design) {
-                designer.start();
+                if(options.silent)
+                    //Start Designer Server in silent mode
+                    cliHelper.nohup('slot', ['start', '-m'/*, '-s'*/], './logs/designer.log');
+                else
+                    designer.start();
             }
             else if (options.watch) {
                 cliHelper.nohup('grunt', [], './logs/auto.log');
@@ -32,15 +40,18 @@ function startCommand(options) {
             else if (options.port) {
                 cliHelper.cmdUnderConstruction()
             }
-            else if (!options.develop && !options.design && !options.all && !options.port) {
+            else if (options.silent || (!options.develop && !options.design && !options.port)) {
                 //Start Designer Server
-                cliHelper.nohup('slot', ['start', '-s'], './logs/designer.log');
+                cliHelper.nohup('slot', ['start', '-m'/*, '-s'*/], './logs/designer.log');
 
                 //Start Automated Build Services
                 cliHelper.nohup('grunt', [], './logs/auto.log');
 
-                //Start Development Server
-                development.start();
+                if(options.silent)
+                //Start Development Server in silent mode
+                    cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
+                else
+                    development.start();
             }
             else {
                 pretty.alert();

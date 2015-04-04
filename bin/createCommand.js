@@ -141,44 +141,57 @@ function createCommand(project) {
                                                                                                 else {
                                                                                                     pretty.done("Servers were created");
 
-                                                                                                    pretty.doing("Setting up Automation Services.. "
-                                                                                                        //+
-                                                                                                        //(path.join(project, "node_modules/slot-framework/Gruntfile.js"))
-                                                                                                        //+ " " +
-                                                                                                        //(path.join(project, "Gruntfile.js"))
-                                                                                                    );
+                                                                                                    pretty.doing("Creating log folder");
 
-                                                                                                    fs.rename(
-                                                                                                          path.join(project, "node_modules/slot-framework/Gruntfile.js")
-                                                                                                        , path.join(project, "Gruntfile.js")
-                                                                                                        , function(){
-                                                                                                        if(err)
-                                                                                                            pretty.failed("Fail setting automation services..");
+                                                                                                    mkdirp(path.join(project, 'logs'), function (err) {
+                                                                                                        if (err) {
+                                                                                                            pretty.fail("Fail creating logs folder");
+                                                                                                            throw err;
+                                                                                                        }
                                                                                                         else {
-                                                                                                            pretty.done("Automation Services were set up..");
+                                                                                                            pretty.done("Log folder was created");
 
-                                                                                                            pretty.doing("Adding home page..");
-                                                                                                            /**
-                                                                                                             * Build project home page
-                                                                                                             */
-                                                                                                            cliActions.addPage(pathToResources, project, "index", slotJson
-                                                                                                                , true /*<<== isHomepage*/
-                                                                                                                , function (err) {
+                                                                                                            pretty.doing("Setting up Automation Services.. "
+                                                                                                                //+
+                                                                                                                //(path.join(project, "node_modules/slot-framework/Gruntfile.js"))
+                                                                                                                //+ " " +
+                                                                                                                //(path.join(project, "Gruntfile.js"))
+                                                                                                            );
+
+                                                                                                            fs.rename(
+                                                                                                                path.join(project, "node_modules/slot-framework/Gruntfile.js")
+                                                                                                                , path.join(project, "Gruntfile.js")
+                                                                                                                , function(){
                                                                                                                     if(err)
-                                                                                                                        pretty.failed("Fail creating home page..");
+                                                                                                                        pretty.failed("Fail setting automation services..");
                                                                                                                     else {
-                                                                                                                        pretty.done("Home page was created");
+                                                                                                                        pretty.done("Automation Services were set up..");
+
+                                                                                                                        pretty.doing("Adding home page..");
                                                                                                                         /**
-                                                                                                                         * TODO:
-                                                                                                                         *  1.  After creation show a message saying:
-                                                                                                                         *      This project have been created with OneTheme, the oficial Bootstrap
-                                                                                                                         *      custom theme for Slot Framework. You can see full show case of OneTheme
-                                                                                                                         *      in:
-                                                                                                                         *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
-                                                                                                                         *
-                                                                                                                         *      Or describe any other theme the user has selected
+                                                                                                                         * Build project home page
                                                                                                                          */
-                                                                                                                        pretty.inform("");
+                                                                                                                        cliActions.addPage(pathToResources, project, "index", slotJson
+                                                                                                                            , true /*<<== isHomepage*/
+                                                                                                                            , function (err) {
+                                                                                                                                if(err)
+                                                                                                                                    pretty.failed("Fail creating home page..");
+                                                                                                                                else {
+                                                                                                                                    pretty.done("Home page was created");
+                                                                                                                                    /**
+                                                                                                                                     * TODO:
+                                                                                                                                     *  1.  After creation show a message saying:
+                                                                                                                                     *      This project have been created with OneTheme, the oficial Bootstrap
+                                                                                                                                     *      custom theme for Slot Framework. You can see full show case of OneTheme
+                                                                                                                                     *      in:
+                                                                                                                                     *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
+                                                                                                                                     *
+                                                                                                                                     *      Or describe any other theme the user has selected
+                                                                                                                                     */
+                                                                                                                                    pretty.inform("");
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        );
                                                                                                                     }
                                                                                                                 }
                                                                                                             );
