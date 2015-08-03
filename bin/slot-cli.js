@@ -56,14 +56,27 @@ program.command('start')
 );
 
 /**
- * TODO:
- *  1.  Implement Stop command
+ * Stop command
  */
 program.command('stop')
-    .description('Stops all services on current slot project')
+    .description('Stops all main services on current slot project')
     .action(function (options) {
 
         stopCommand(options);
+    }
+);
+
+/**
+ * Restart command
+ */
+program.command('restart')
+    .description('Restarts all main services on current slot project')
+    .option("-s, --silent", "Restarts the services on silent mode")
+    .action(function (options) {
+
+        stopCommand(options, function() { //onSuccess callback function
+            startCommand(options);
+        });
     }
 );
 

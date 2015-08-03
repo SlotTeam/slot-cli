@@ -7,7 +7,7 @@ var fs = require("fs"),
     cliHelper = require('./cliHelper'),
     pretty = require('./prettyMessage');
 
-function stopCommand(options) {
+function stopCommand(options, onSuccess) {
     //Validate that we are located on a valid slot project
     cliHelper.isValidRootDir(process.cwd()
         , function (exists) {
@@ -16,7 +16,7 @@ function stopCommand(options) {
                 pidFile = require(path.join(process.cwd(), '.pid.json'));
 
                 //Kill all main services listed in the pid.json file
-                var services = ['development', 'designer', 'watch'], service;
+                var services = ['development', 'designer', 'watch'], service, failsStopping = false;
 
                 pretty.alert();
 
@@ -26,11 +26,19 @@ function stopCommand(options) {
                         pretty.alert('Stopping %s service pid: %s success', services[service], pidFile[services[service]].pid);
                     }
                     catch(e) {
+                        failsStopping = true;
                         pretty.alert('Problems stopping %s service pid: %s', services[service], pidFile[services[service]].pid);
                     }
                 }
 
                 pretty.alert();
+
+                /**
+                 * Start services again if onSuccess callback function parameter was send, and,
+                 * if there were not failures stopping services.
+                 */
+                //!failsStopping &&
+                onSuccess && onSuccess(options);
             }
         }
         , function (exists) {
