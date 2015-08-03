@@ -16,6 +16,7 @@ var program = require('commander'),
     createCommand = require('./createCommand'),
     addCommand = require('./addCommand'),
     startCommand = require('./startCommand'),
+    stopCommand = require('./stopCommand'),
     exportCommand = require('./exportCommand'),
     pretty = require('./prettyMessage'),
     pkg = require('../package.json');
@@ -58,6 +59,13 @@ program.command('start')
  * TODO:
  *  1.  Implement Stop command
  */
+program.command('stop')
+    .description('Stops all services on current slot project')
+    .action(function (options) {
+
+        stopCommand(options);
+    }
+);
 
 program.command('add')
     .description('Adds a new object to current slot project')
