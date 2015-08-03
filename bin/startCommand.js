@@ -41,17 +41,27 @@ function startCommand(options) {
                 cliHelper.cmdUnderConstruction()
             }
             else if (options.silent || (!options.develop && !options.design && !options.port)) {
+                pretty.alert();
+                pretty.alert('Starting designer service');
+                //
                 //Start Designer Server
                 cliHelper.nohup('slot', ['start', '-m'/*, '-s'*/], './logs/designer.log');
 
+                pretty.alert('Starting watch service');
+                //
                 //Start Automated Build Services
                 cliHelper.nohup('grunt', [], './logs/auto.log');
 
-                if(options.silent)
-                //Start Development Server in silent mode
+                pretty.alert('Starting development service');
+                //
+                if(options.silent) {
+                    // Start Development Server in silent mode
                     cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
+                }
                 else
                     development.start();
+
+                pretty.alert();
             }
             else {
                 pretty.alert();

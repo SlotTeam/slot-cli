@@ -37,7 +37,7 @@ function addCommand(options) {
                 });
             }
             else if (options.page) {
-                cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, function(err) {
+                cliActions.addPage(pathToResources, process.cwd(), options.page, slotJson, false/*isHomePage*/, slotJsonFile, function(err) {
                     if(err)
                         pretty.failed("Fail creating page '%s'", options.page);
                     else

@@ -16,10 +16,11 @@ var path = require("path"),
  * @param {string} projectFolder     Full path where the project folder has been created
  * @param {string} page              The page name
  * @param {Object} slotJson          JavaScript object that holds the 'slot.json' file config
- * @param {boleean} isHomePage          JavaScript object that holds the 'slot.json' file config
+ * @param {boleean} isHomePage       JavaScript object that holds the 'slot.json' file config
+ * @param {string} slotJsonFile      Full path to 'slot.json'
  * @param {function} callback
  */
-function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, callback) {
+function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, slotJsonFile, callback) {
 
     if (page.trim() != '') {
         pretty.doing("Adding new page '%s'", page);
@@ -37,7 +38,30 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, cal
                     if (err)
                         callback(err);
                     else {
-                        cliHelper.buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, callback);
+                        // Create page objects on file system
+                        cliHelper.buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, function(err) {
+                            if (err)
+                                callback(err);
+                            else {
+                                // Validate slot.pages already exists
+                                !slotJson.pages && (slotJson['pages'] = {});
+
+                                // Add the newly created page on slot.json file
+                                var pageName = page.split('/').pop();
+                                slotJson.pages[pageName] = '/' + page;
+                                slotJson.pages = sortObj(slotJson.pages);
+                                delete pageName;
+
+                                fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
+                                    //if (err) {
+                                    //    pretty.failed("Fail creating '%s'", page);
+                                    //    throw err;
+                                    //}
+                                    //pretty.done("page '%s' created on '%s'", page, 'todo_path');
+                                    callback(err)
+                                });
+                            }
+                        });
                     }
                 });
             }
@@ -82,6 +106,9 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
                             if (err)
                                 callback(err);
                             else {
+                                // Validate slot.fragments already exists
+                                !slotJson.fragments && (slotJson['fragments'] = {});
+
                                 // Add the newly created fragment on slot.json file
                                 var fragmentName = fragment.split('/').pop();
                                 slotJson.fragments[fragmentName] = '/' + fragment;

@@ -37,8 +37,7 @@ function stopCommand(options, onSuccess) {
                  * Start services again if onSuccess callback function parameter was send, and,
                  * if there were not failures stopping services.
                  */
-                //!failsStopping &&
-                onSuccess && onSuccess(options);
+                !failsStopping && onSuccess && setTimeout(function() { onSuccess(options); }, 3000);
             }
         }
         , function (exists) {
