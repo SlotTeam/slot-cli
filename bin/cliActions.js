@@ -44,20 +44,15 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, slo
                                 callback(err);
                             else {
                                 // Validate slot.pages already exists
-                                !slotJson.pages && (slotJson['pages'] = {});
+                                !slotJson.pages && (slotJson['pages'] = []);
 
                                 // Add the newly created page on slot.json file
-                                var pageName = page.split('/').pop();
-                                slotJson.pages[pageName] = '/' + page;
-                                slotJson.pages = sortObj(slotJson.pages);
-                                delete pageName;
+                                slotJson.pages.push('/' + page);
+                                slotJson.pages = slotJson.pages.sort().filter(function(item, pos, ary) {
+                                    return !pos || item != ary[pos - 1];
+                                });
 
                                 fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
-                                    //if (err) {
-                                    //    pretty.failed("Fail creating '%s'", page);
-                                    //    throw err;
-                                    //}
-                                    //pretty.done("page '%s' created on '%s'", page, 'todo_path');
                                     callback(err)
                                 });
                             }
@@ -95,7 +90,7 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
         //
         mkdirp(path.join(projectFolder, path.join(slotJson.framework.fragmentRootDir, folder)), function (err) {
             if (err)
-                callback(err); //console.error(err)
+                callback(err);
             else {
                 mkdirp(path.join(projectFolder, path.join(slotJson.framework.metaData, folder)), function (err) {
                     if (err)
@@ -116,11 +111,6 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
                                 delete fragmentName;
 
                                 fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
-                                    //if (err) {
-                                    //    pretty.failed("Fail creating '%s'", fragment);
-                                    //    throw err;
-                                    //}
-                                    //pretty.done("Fragment '%s' created on '%s'", fragment, 'todo_path');
                                     callback(err)
                                 });
                             }
