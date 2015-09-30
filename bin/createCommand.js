@@ -173,6 +173,7 @@ function createCommand(project) {
                                                                                                                          */
                                                                                                                         cliActions.addPage(pathToResources, project, "index", slotJson
                                                                                                                             , true /*<<== isHomepage*/
+                                                                                                                            , path.join(project, "slot.json") //slotJsonFile
                                                                                                                             , function (err) {
                                                                                                                                 if(err)
                                                                                                                                     pretty.failed("Fail creating home page..");
