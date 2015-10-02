@@ -26,6 +26,8 @@ function startCommand(options) {
                     cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
                 else
                     development.start();
+
+                compileAllPages();
             }
             else if (options.design) {
                 if(options.silent)
@@ -33,6 +35,8 @@ function startCommand(options) {
                     cliHelper.nohup('slot', ['start', '-m'/*, '-s'*/], './logs/designer.log');
                 else
                     designer.start();
+
+                compileAllPages();
             }
             else if (options.watch) {
                 cliHelper.nohup('grunt', [], './logs/auto.log');
@@ -61,15 +65,9 @@ function startCommand(options) {
                 else
                     development.start();
 
-                pretty.alert();
+                compileAllPages();
 
-                /**
-                 * TODO:
-                 *  1.  After all services are being created, we need to invoke a build for all the pages located
-                 *      on slot.json/pages. This task maybe must be added as a task on Grunt.
-                 */
-                //slotJson = require(slotJsonFile);
-                compilePages();
+                pretty.alert();
             }
             else {
                 pretty.alert();
@@ -85,63 +83,19 @@ function startCommand(options) {
     );
 }
 
-function compilePages() {
-    async = require('async')
-    slotJson = require(slotJsonFile);
+function compileAllPages() {
+    /**
+     *  After all services are being started, we need to invoke a build for all the pages located
+     *  on slot.json/pages.
+     */
+    setTimeout(function() {
 
-    //for(xx in slotJson.pages) {
-    //    pretty.alert("Compiling page %s", slotJson.pages[xx]+".html");
-    //}
+        var GruntTasks = require('../node_modules/slot-framework/lib/gruntTasks').create(),
+            usageMap = require(path.join(process.cwd(), '.usageMap.json'));
 
-    async.eachSeries(slotJson.pages, function( page, callback) {
-        //console.log('fragment: ' + fragmentName + ' - related page:' + page);
-        pretty.alert("Compiling page %s", page+".html");
+        GruntTasks.buildAllPages(slotJson, usageMap);
 
-        setTimeout(function() {
-            buildPage(page, function(content) {
-                pretty.alert('received content: ' + content.length + 'Kb - ' + (new Date()).getTime() );
-
-                callback();
-            });
-        }, 1000);
-
-    }, function(err){
-        // if any of the file processing produced an error, err would equal that error
-        if( err ) {
-            // One of the iterations produced an error, the processing will now stop.
-            console.log('Building pages has failed');
-        } else {
-            console.log('All pages have been built successfully');
-        }
-    });
-
+    }, 5000);
 }
-
-function buildPage(url, callbackEnd) {
-    var http = require('http');
-    var options = {
-        host: '127.0.0.1',
-        path: url,
-        port :2001
-    };
-
-    callback = function(response) {
-        var str = '';
-
-        //another chunk of data has been recieved, so append it to `str`
-        response.on('data', function (chunk) {
-            str += chunk;
-        });
-
-        //the whole response has been recieved, so we just print it out here
-        response.on('end', function () {
-            // console.log(str);
-            callbackEnd(str);
-        });
-    }
-
-    http.request(options, callback).end();
-}
-
 
 module.exports = startCommand;
