@@ -27,7 +27,7 @@ function startCommand(options) {
                 else
                     development.start();
 
-                compileAllPages();
+                compileAllPages(5000);
             }
             else if (options.design) {
                 if(options.silent)
@@ -36,7 +36,7 @@ function startCommand(options) {
                 else
                     designer.start();
 
-                compileAllPages();
+                compileAllPages(5000);
             }
             else if (options.watch) {
                 cliHelper.nohup('grunt', [], './logs/auto.log');
@@ -65,7 +65,7 @@ function startCommand(options) {
                 else
                     development.start();
 
-                compileAllPages();
+                compileAllPages(5000);
 
                 pretty.alert();
             }
@@ -83,11 +83,11 @@ function startCommand(options) {
     );
 }
 
-function compileAllPages() {
-    /**
-     *  After all services are being started, we need to invoke a build for all the pages located
-     *  on slot.json/pages.
-     */
+/**
+ *  After all servers are being started, we need to invoke a build for all the pages located
+ *  on slot.json/pages.
+ */
+function compileAllPages(waitTime) {
     setTimeout(function() {
 
         var GruntTasks = require('../node_modules/slot-framework/lib/gruntTasks').create(),
@@ -95,7 +95,7 @@ function compileAllPages() {
 
         GruntTasks.buildAllPages(slotJson, usageMap);
 
-    }, 5000);
+    }, waitTime);
 }
 
 module.exports = startCommand;
