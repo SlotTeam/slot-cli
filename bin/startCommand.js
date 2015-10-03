@@ -25,9 +25,15 @@ function startCommand(options) {
                     //Start Development Server in silent mode
                     cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
                 else
-                    development.start();
-
-                compileAllPages(5000);
+                    development.start(
+                        3001,
+                        function(){
+                            pretty.alert();
+                            pretty.alert('Development server has been started..');
+                            pretty.alert();
+                            compileAllPages(5000);
+                        }
+                    );
             }
             else if (options.design) {
                 if(options.silent)
@@ -63,9 +69,15 @@ function startCommand(options) {
                     cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
                 }
                 else
-                    development.start();
-
-                compileAllPages(5000);
+                    development.start(
+                        3001,
+                        function(){
+                            pretty.alert();
+                            pretty.alert('Development server has been started..');
+                            pretty.alert();
+                            compileAllPages(5000);
+                        }
+                    );
 
                 pretty.alert();
             }
