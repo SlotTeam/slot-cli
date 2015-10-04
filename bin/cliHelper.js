@@ -147,25 +147,33 @@ function buildPage(pathToResources, projectFolder, page, slotJson, isHomePage, c
         pageType = isHomePage ? projectFolder + pageType : page + pageType
         ;
 
-    // Create Meta-data binding file
-    buildResource(path.join(pathToResources, "ref-page-bind.json")
-        , path.join(path.join(projectFolder, slotJson.framework.metaData), page + ".json")
-        , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
-        , [page, nowTimeStamp, pageType, "Welcome to " + pageType]
-        , function(err) {
-            if(err)
-                callback(false);
-            else {
-                //Create HTML file
-                buildResource(path.join(pathToResources, "ref-page.html")
-                    , path.join(path.join(projectFolder, slotJson.framework.webRootDir), page + ".html")
-                    , ["page-name", "page-creation-date"]
-                    , [page, nowTimeStamp]
-                    , callback
-                );
+    // Wait a seconds to avoid coalitions on building services
+    setTimeout(function(){
+
+        // Create Meta-data binding file
+        buildResource(path.join(pathToResources, "ref-page-bind.json")
+            , path.join(path.join(projectFolder, slotJson.framework.metaData), page + ".json")
+            , ["page-name", "page-creation-date", "pageTitle", "welcomeMsg"]
+            , [page, nowTimeStamp, pageType, "Welcome to " + pageType]
+            , function(err) {
+                if(err)
+                    callback(false);
+                else {
+                    // Wait a seconds to avoid coalitions on building services
+                    setTimeout(function(){
+
+                        //Create HTML file
+                        buildResource(path.join(pathToResources, "ref-page.html")
+                            , path.join(path.join(projectFolder, slotJson.framework.webRootDir), page + ".html")
+                            , ["page-name", "page-creation-date"]
+                            , [page, nowTimeStamp]
+                            , callback
+                        );
+                    }, 1000);
+                }
             }
-        }
-    );
+        );
+    }, 1000);
 }
 
 function buildFragment(pathToResources, projectFolder, fragment, slotJson, callback) {
@@ -173,26 +181,34 @@ function buildFragment(pathToResources, projectFolder, fragment, slotJson, callb
     var nowTimeStamp = (new Date()).toDateString() + " " + (new Date()).toLocaleTimeString(),
         prefixedName = fragment.split('/').pop();
 
-    // Create Meta-data binding file
-    buildResource(path.join(pathToResources, "ref-fragment-bind.json")
-        , path.join(path.join(projectFolder, slotJson.framework.metaData), fragment + ".json")
-        , ["fragmentID"]
-        //, ['frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1))]
-        , [prefixedName]
-        , function(err) {
-            if(err)
-                callback(false);
-            else {
-                //Create HTML file
-                buildResource(path.join(pathToResources, "ref-fragment.html")
-                    , path.join(path.join(projectFolder, slotJson.framework.fragmentRootDir), fragment + ".html")
-                    , ["fragment-name", "fragment-creation-date"]
-                    , [fragment, nowTimeStamp]
-                    , callback
-                );
+    // Wait a seconds to avoid coalitions on building services
+    setTimeout(function(){
+
+        // Create Meta-data binding file
+        buildResource(path.join(pathToResources, "ref-fragment-bind.json")
+            , path.join(path.join(projectFolder, slotJson.framework.metaData), fragment + ".json")
+            , ["fragmentID"]
+            //, ['frg' + (prefixedName.charAt(0).toUpperCase() + prefixedName.slice(1))]
+            , [prefixedName]
+            , function(err) {
+                if(err)
+                    callback(false);
+                else {
+                    // Wait a seconds to avoid coalitions on building services
+                    setTimeout(function(){
+
+                        //Create HTML file
+                        buildResource(path.join(pathToResources, "ref-fragment.html")
+                            , path.join(path.join(projectFolder, slotJson.framework.fragmentRootDir), fragment + ".html")
+                            , ["fragment-name", "fragment-creation-date"]
+                            , [fragment, nowTimeStamp]
+                            , callback
+                        );
+                    }, 1000);
+                }
             }
-        }
-    );
+        );
+    }, 1000);
 }
 
 function buildRestService(pathToResources, projectFolder, rest, slotJson, callback) {
