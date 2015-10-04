@@ -26,12 +26,12 @@ function startCommand(options) {
                     cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
                 else
                     development.start(
-                        3001,
+                        undefined,
                         function(){
                             pretty.alert();
                             pretty.alert('Development server has been started..');
                             pretty.alert();
-                            compileAllPages(5000);
+                            compileAllPages(1500);
                         }
                     );
             }
@@ -40,9 +40,15 @@ function startCommand(options) {
                     //Start Designer Server in silent mode
                     cliHelper.nohup('slot', ['start', '-m'/*, '-s'*/], './logs/designer.log');
                 else
-                    designer.start();
-
-                compileAllPages(5000);
+                    designer.start(
+                        undefined,
+                        function(){
+                            pretty.alert();
+                            pretty.alert('Designer server has been started..');
+                            pretty.alert();
+                            //compileAllPages(1500);
+                        }
+                    );
             }
             else if (options.watch) {
                 cliHelper.nohup('grunt', [], './logs/auto.log');
@@ -70,12 +76,12 @@ function startCommand(options) {
                 }
                 else
                     development.start(
-                        3001,
+                        undefined,
                         function(){
                             pretty.alert();
                             pretty.alert('Development server has been started..');
                             pretty.alert();
-                            compileAllPages(5000);
+                            compileAllPages(1500);
                         }
                     );
 
