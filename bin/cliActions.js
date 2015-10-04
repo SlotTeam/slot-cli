@@ -54,19 +54,6 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, slo
 
                                 fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
 
-                                    /**
-                                     * TODO:
-                                     *  1.  Call auto compile for the recently created page.
-                                     */
-                                    //GruntTasks =    require('../node_modules/slot-framework/lib/gruntTasks').create();
-                                    //
-                                    //var usageMap;
-                                    ////Load usageMap.json file
-                                    //usageMap = fs.readFileSync(path.join(process.cwd(), './.usageMap.json'),'binary');
-                                    //usageMap = JSON.parse(usageMap);
-
-
-
                                     callback(err)
                                 });
                             }
