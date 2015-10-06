@@ -36,10 +36,35 @@ function nohup(command, arguments, logFile) {
         out = fs.openSync(logFile, 'a'),
         err = fs.openSync(logFile, 'a');
 
-    spawn(command, arguments, {
-        stdio: [ 'ignore', out, err ], // piping stdout and stderr to out.log
-        detached: true
-    }).unref();
+    if(os.platform() == 'win32') {
+
+        //Add comspec and command as a part of the arguments
+        arguments.unshift('/c', command);
+
+        spawn(process.env.comspec, arguments, {
+            stdio: ['ignore', out, err], // piping stdout and stderr to out.log
+            detached: true
+        }).unref();
+    }
+    else {
+        spawn(command, arguments, {
+            stdio: ['ignore', out, err], // piping stdout and stderr to out.log
+            detached: true
+        }).unref();
+    }
+
+    //var spawn = require('child_process').spawn;
+    //var cp = spawn(process.env.comspec, ['/c', 'command', '-arg1', '-arg2']);
+    //
+    //cp.stdout.on("data", function(data) {
+    //    console.log(data.toString());
+    //});
+    //
+    //cp.stderr.on("data", function(data) {
+    //    console.error(data.toString());
+    //});
+
+    //arguments.unshift('/c', 'command')
 }
 
 function isValidRootDir(dirPath, onExists, onDontExists) {
