@@ -2,7 +2,8 @@
  * Created by cecheveria on 1/31/2015.
  */
 
-var program = require('commander'),
+var //program = require('commander'),
+    os = require("os"),
     fs = require("fs"),
     path = require("path"),
     mkdirp = require('mkdirp'),
@@ -135,7 +136,7 @@ function createCommand(project) {
                                                                                         /**
                                                                                          * Execute 'npm install -g grunt-cli' to build all dependencies
                                                                                          */
-                                                                                        cliHelper.runCmd('sudo npm install -g grunt-cli', "Installing grunt:", false, function (error, stdout, stderr) {
+                                                                                        cliHelper.runCmd((os.platform() == 'win32' ? '' : 'sudo ') + 'npm install -g grunt-cli', "Installing grunt:", false, function (error, stdout, stderr) {
                                                                                             if (error) {
                                                                                                 pretty.failed("Fail installing grunt");
                                                                                                 pretty.failed("%s", error);
