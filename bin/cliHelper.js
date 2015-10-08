@@ -9,25 +9,41 @@ var os = require("os"),
     exec = require('child_process').exec,
     pretty = require('./prettyMessage');
 
-var run = function (cmd, callback) {
+var run = function (cmd, onStdOut, onStdErr, callback) {
     var child = exec(cmd, function (error, stdout, stderr) {
 
-        /**
-         * TODO:
-         *  1.  Pass a parameter to know if we are going to show the stdout/stderr/error
-         */
-        /*if (stderr !== null) {
-            console.log('' + stderr);
-        }
-        if (stdout !== null) {
-            console.log('' + stdout);
-        }
-        if (error !== null) {
-            console.log('' + error);
-        }*/
         callback(error, stdout, stderr);
     });
+
+    child.stdout.on("data", function(data) {
+        onStdOut(data);
+    });
+
+    child.stderr.on("data", function(data) {
+        onStdErr(data);
+    });
 };
+
+function runCmd(command, message, verbose, callback) {
+
+    pretty.doing(message);
+    process.stdout.write("  ");
+
+    // Execute command..
+    run(command
+        , function(data) {  // <<-- onStdOut calllback
+            verbose ? console.log(data.toString()) : process.stdout.write(".");
+        }
+        , function(data) {  // <<-- onStdErr calllback
+            verbose ? console.log(data.toString()) : process.stdout.write(".");
+        }
+        , function(error, stdout, stderr) {  // <<-- final calllback
+            console.log();
+
+            callback(error, stdout, stderr);
+        }
+    );
+}
 
 function nohup(command, arguments, logFile) {
 
@@ -52,19 +68,6 @@ function nohup(command, arguments, logFile) {
             detached: true
         }).unref();
     }
-
-    //var spawn = require('child_process').spawn;
-    //var cp = spawn(process.env.comspec, ['/c', 'command', '-arg1', '-arg2']);
-    //
-    //cp.stdout.on("data", function(data) {
-    //    console.log(data.toString());
-    //});
-    //
-    //cp.stderr.on("data", function(data) {
-    //    console.error(data.toString());
-    //});
-
-    //arguments.unshift('/c', 'command')
 }
 
 function isValidRootDir(dirPath, onExists, onDontExists) {
@@ -79,20 +82,27 @@ function isValidRootDir(dirPath, onExists, onDontExists) {
     });
 }
 
-function npmInstall(project, callback) {
+function npmInstall(project, message, callback) {
 
     if (project.trim() != '') {
-        pretty.doing("Installing npm dependencies..");
 
         var current = process.cwd(),
             folder = path.join(process.cwd(), project);
 
+        // Step into the project dir
         process.chdir(folder);
+
         // Execute npm install for all dependencies..
-        run('npm install' , function(error, stdout, stderr) {
-            process.chdir(current);
-            callback(error, stdout, error);
-        });
+        runCmd('npm install'
+            , message
+            , false     // <<-- verbose
+            , function(error, stdout, stderr) {
+
+                // Step back into the current dir
+                process.chdir(current);
+                callback(error, stdout, stderr);
+            }
+        );
     }
     else {
         pretty.alert("Please enter a valid project name");
@@ -251,6 +261,7 @@ function buildRestService(pathToResources, projectFolder, rest, slotJson, callba
 
 
 module.exports.run = run;
+module.exports.runCmd = runCmd;
 module.exports.nohup = nohup;
 module.exports.isValidRootDir = isValidRootDir;
 module.exports.npmInstall = npmInstall;

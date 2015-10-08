@@ -120,100 +120,118 @@ function createCommand(project) {
                                                                                 pretty.inform("Saved package.json on: %s", pathFile);
                                                                                 pretty.done("Initial project config was set..");
 
-                                                                                pretty.doing("Installing new project..");
                                                                                 /**
                                                                                  * Execute 'npm install' to build all dependencies
                                                                                  */
-                                                                                cliHelper.npmInstall(project, function (error, stdout, stderr) {
+                                                                                cliHelper.npmInstall(project, "Installing npm dependencies:", function (error, stdout, stderr) {
                                                                                     if(error) {
                                                                                         pretty.failed("Fail creating project '%s'", project);
                                                                                         pretty.failed("%s", error);
                                                                                     }
                                                                                     else {
-                                                                                        pretty.done("Project '%s' was correctly created..", project/*, folder*/);
+                                                                                        pretty.done("Dependencies added to project %s..", project/*, folder*/);
 
-                                                                                        cliHelper.buildServers(pathToResources, project
-                                                                                            , function (err) {
-                                                                                                if(err) {
-                                                                                                    pretty.failed("Fail creating servers");
-                                                                                                    pretty.failed("%s", error);
-                                                                                                }
-                                                                                                else {
-                                                                                                    pretty.done("Servers were created");
+                                                                                        //pretty.doing("Installing grunt..");
+                                                                                        /**
+                                                                                         * Execute 'npm install -g grunt-cli' to build all dependencies
+                                                                                         */
+                                                                                        cliHelper.runCmd('sudo npm install -g grunt-cli', "Installing grunt:", false, function (error, stdout, stderr) {
+                                                                                            if (error) {
+                                                                                                pretty.failed("Fail installing grunt");
+                                                                                                pretty.failed("%s", error);
+                                                                                            }
+                                                                                            else {
+                                                                                                pretty.done("Grunt CLI was installed..");
+                                                                                                pretty.alert();
 
-                                                                                                    pretty.doing("Creating log folder");
-
-                                                                                                    mkdirp(path.join(project, 'logs'), function (err) {
+                                                                                                pretty.doing("Adding boilerplate to project..");
+                                                                                                //
+                                                                                                cliHelper.buildServers(pathToResources, project
+                                                                                                    , function (err) {
                                                                                                         if (err) {
-                                                                                                            pretty.fail("Fail creating logs folder");
-                                                                                                            throw err;
+                                                                                                            pretty.failed("Fail creating servers");
+                                                                                                            pretty.failed("%s", error);
                                                                                                         }
                                                                                                         else {
-                                                                                                            pretty.done("Log folder was created");
+                                                                                                            pretty.done("Servers were created");
 
-                                                                                                            pretty.doing("Setting up Automation Services.. "
-                                                                                                                //+
-                                                                                                                //(path.join(project, "node_modules/slot-framework/Gruntfile.js"))
-                                                                                                                //+ " " +
-                                                                                                                //(path.join(project, "Gruntfile.js"))
-                                                                                                            );
+                                                                                                            pretty.doing("Creating log folder");
 
-                                                                                                            fs.rename(
-                                                                                                                path.join(project, "node_modules/slot-framework/Gruntfile.js")
-                                                                                                                , path.join(project, "Gruntfile.js")
-                                                                                                                , function(){
-                                                                                                                    if(err)
-                                                                                                                        pretty.failed("Fail setting automation services..");
-                                                                                                                    else {
-                                                                                                                        pretty.done("Automation Services were set up..");
-
-                                                                                                                        pretty.doing("Adding usageMap.json..");
-                                                                                                                        /**
-                                                                                                                         * Create usageMap.json file
-                                                                                                                         */
-                                                                                                                        content = fs.readFileSync(path.join(pathToResources, "ref_usageMap.json"), 'binary');
-                                                                                                                        pathFile = path.join(project, ".usageMap.json");
-                                                                                                                        //
-                                                                                                                        fs.writeFile(pathFile, content, function (err) {
-                                                                                                                            if (err) throw err;
-                                                                                                                            pretty.inform("Saved usageMap.json on: %s", pathFile);
-                                                                                                                            //pretty.done("Initial project config was set..");
-
-                                                                                                                            pretty.doing("Adding home page..");
-                                                                                                                            /**
-                                                                                                                             * Build project home page
-                                                                                                                             */
-                                                                                                                            cliActions.addPage(pathToResources, project, "index", slotJson
-                                                                                                                                , true /*<<== isHomepage*/
-                                                                                                                                , path.join(project, "slot.json") //slotJsonFile
-                                                                                                                                , function (err) {
-                                                                                                                                    if (err)
-                                                                                                                                        pretty.failed("Fail creating home page..");
-                                                                                                                                    else {
-                                                                                                                                        pretty.done("Home page was created");
-                                                                                                                                        /**
-                                                                                                                                         * TODO:
-                                                                                                                                         *  1.  After creation show a message saying:
-                                                                                                                                         *      This project have been created with OneTheme, the oficial Bootstrap
-                                                                                                                                         *      custom theme for Slot Framework. You can see full show case of OneTheme
-                                                                                                                                         *      in:
-                                                                                                                                         *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
-                                                                                                                                         *
-                                                                                                                                         *      Or describe any other theme the user has selected
-                                                                                                                                         */
-                                                                                                                                        pretty.inform("");
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                            );
-                                                                                                                        });
-                                                                                                                    }
+                                                                                                            mkdirp(path.join(project, 'logs'), function (err) {
+                                                                                                                if (err) {
+                                                                                                                    pretty.fail("Fail creating logs folder");
+                                                                                                                    throw err;
                                                                                                                 }
-                                                                                                            );
+                                                                                                                else {
+                                                                                                                    pretty.done("Log folder was created");
+
+                                                                                                                    pretty.doing("Setting up Automation Services.. "
+                                                                                                                        //+
+                                                                                                                        //(path.join(project, "node_modules/slot-framework/Gruntfile.js"))
+                                                                                                                        //+ " " +
+                                                                                                                        //(path.join(project, "Gruntfile.js"))
+                                                                                                                    );
+
+                                                                                                                    fs.rename(
+                                                                                                                        path.join(project, "node_modules/slot-framework/Gruntfile.js")
+                                                                                                                        , path.join(project, "Gruntfile.js")
+                                                                                                                        , function () {
+                                                                                                                            if (err)
+                                                                                                                                pretty.failed("Fail setting automation services..");
+                                                                                                                            else {
+                                                                                                                                pretty.done("Automation Services were set up..");
+
+                                                                                                                                pretty.doing("Adding usageMap.json..");
+                                                                                                                                /**
+                                                                                                                                 * Create usageMap.json file
+                                                                                                                                 */
+                                                                                                                                content = fs.readFileSync(path.join(pathToResources, "ref_usageMap.json"), 'binary');
+                                                                                                                                pathFile = path.join(project, ".usageMap.json");
+                                                                                                                                //
+                                                                                                                                fs.writeFile(pathFile, content, function (err) {
+                                                                                                                                    if (err) throw err;
+                                                                                                                                    pretty.done("Saved usageMap.json on: %s", pathFile);
+                                                                                                                                    //pretty.done("Initial project config was set..");
+
+                                                                                                                                    pretty.doing("Adding home page..");
+                                                                                                                                    /**
+                                                                                                                                     * Build project home page
+                                                                                                                                     */
+                                                                                                                                    cliActions.addPage(pathToResources, project, "index", slotJson
+                                                                                                                                        , true /*<<== isHomepage*/
+                                                                                                                                        , path.join(project, "slot.json") //slotJsonFile
+                                                                                                                                        , function (err) {
+                                                                                                                                            if (err)
+                                                                                                                                                pretty.failed("Fail creating home page..");
+                                                                                                                                            else {
+                                                                                                                                                pretty.done("Home page was created");
+                                                                                                                                                /**
+                                                                                                                                                 * TODO:
+                                                                                                                                                 *  1.  After creation show a message saying:
+                                                                                                                                                 *      This project have been created with OneTheme, the oficial Bootstrap
+                                                                                                                                                 *      custom theme for Slot Framework. You can see full show case of OneTheme
+                                                                                                                                                 *      in:
+                                                                                                                                                 *          http://www.slotframework.org/slot-themes/bootstrap/oneTheme
+                                                                                                                                                 *
+                                                                                                                                                 *      Or describe any other theme the user has selected
+                                                                                                                                                 */
+                                                                                                                                                pretty.inform("");
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    );
+                                                                                                                                });
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    );
+                                                                                                                }
+                                                                                                            });
                                                                                                         }
-                                                                                                    });
-                                                                                                }
+                                                                                                    }
+                                                                                                );
                                                                                             }
-                                                                                        );
+                                                                                        });
+
+
                                                                                     }
                                                                                 });
                                                                             });
