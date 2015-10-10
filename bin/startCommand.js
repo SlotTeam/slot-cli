@@ -26,7 +26,7 @@ function startCommand(options) {
                     cliHelper.nohup('slot', ['start', '-d'/*, '-s'*/], './logs/development.log');
                 else
                     development.start(
-                        undefined,
+                        slotJson.server.port, //undefined,
                         function(){
                             pretty.alert();
                             pretty.alert('Development server has been started..');
@@ -76,7 +76,7 @@ function startCommand(options) {
                 }
                 else
                     development.start(
-                        undefined,
+                        slotJson.server.port,
                         function(){
                             pretty.alert();
                             pretty.alert('Development server has been started..');
