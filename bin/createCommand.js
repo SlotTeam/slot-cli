@@ -216,7 +216,7 @@ function createCommand(project) {
                                                                                                                                                  *
                                                                                                                                                  *      Or describe any other theme the user has selected
                                                                                                                                                  */
-                                                                                                                                                pretty.inform("");
+                                                                                                                                                //pretty.inform("");
                                                                                                                                             }
                                                                                                                                         }
                                                                                                                                     );

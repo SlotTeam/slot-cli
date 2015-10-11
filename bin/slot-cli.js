@@ -14,6 +14,7 @@
  */
 var program = require('commander'),
     createCommand = require('./createCommand'),
+    configCommand = require('./configCommand'),
     addCommand = require('./addCommand'),
     startCommand = require('./startCommand'),
     stopCommand = require('./stopCommand'),
@@ -43,6 +44,21 @@ program.command('create [project]')
         createCommand(project);
     });
 
+/**
+ * Config command
+ */
+program.command('config')
+    .description('Configures server properties on current slot project')
+    .option(", --port [port]", "Set server.port property")
+    .action(function (options) {
+
+        configCommand(options);
+    }
+);
+
+/**
+ * Start command
+ */
 program.command('start')
     .description('Starts servers on current slot project, without parameters, it starts the designer server by default')    //.option("-p, --port [port]", "specify the port [3000]", /*Number,*/ 3000)
     .option("-m, --design", "Start the designer server on current project")
