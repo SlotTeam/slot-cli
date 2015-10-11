@@ -5,6 +5,7 @@
 var fs = require("fs"),
     path = require("path"),
     cliHelper = require('./cliHelper'),
+    cliActions = require('./cliActions'),
     pretty = require('./prettyMessage');
 var slotJson,
     slotJsonFile;
@@ -20,36 +21,28 @@ function configCommand(options) {
             //pretty.alert("Port%s %s", slotJsonFile, typeof options.port);
 
             if (options.port) {
-                if ((!isNaN(options.port) && Number.isInteger(eval(options.port)))) {
 
-                    pretty.doing();
-                    pretty.doing('Setting server.port property');
-
-                    //Setting server port
+                var reg = new RegExp(/^\d+$/);
+                //
+                if(reg.test(options.port)) {
+                    // Setting server port
                     slotJson.server.port = eval(options.port);
 
-                    // Update the slot.json file
-                    fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
+                    // Update slot.json file
+                    cliActions.setConfigProperty(slotJson, slotJsonFile, 'server.port', function(err) {
                         if (err)
                             pretty.failed('setting server.port=%s', options.port);
                         else
                             pretty.done('server.port=%s was set', options.port);
-
                         pretty.alert();
                     });
                 }
                 else {
-                    pretty.alert();
-                    pretty.alert("Please enter a valid port number");
-                    pretty.alert("   To see help use: slot config -h");
-                    pretty.alert();
+                    cliActions.showHelpMsg("Please enter a valid port number", "slot config -h")
                 }
             }
             else {
-                pretty.alert();
-                pretty.alert("Please enter a valid command");
-                pretty.alert("   To see help use: slot config -h");
-                pretty.alert();
+                cliActions.showHelpMsg("Please enter a valid command", "slot config -h")
             }
         }
         , function (exists) {

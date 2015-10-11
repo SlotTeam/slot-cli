@@ -64,9 +64,7 @@ function addPage(pathToResources, projectFolder, page, slotJson, isHomePage, slo
         });
     }
     else {
-        pretty.alert();
-        pretty.alert('Please enter a valid page name');
-        pretty.alert('   To see help use: slot add -h');
+        showHelpMsg("Please enter a valid page name", "slot add -h")
     }
 }
 
@@ -122,9 +120,7 @@ function addFragment(pathToResources, projectFolder, fragment, slotJson, slotJso
         });
     }
     else {
-        pretty.alert();
-        pretty.alert('Please enter a valid fragment name');
-        pretty.alert('   To see help use: slot add -h');
+        showHelpMsg("Please enter a valid fragment name", "slot add -h")
     }
 }
 
@@ -154,12 +150,37 @@ function addRestService(pathToResources, projectFolder, rest, slotJson, callback
         });
     }
     else {
-        pretty.alert();
-        pretty.alert('Please enter a valid rest service name');
-        pretty.alert('   To see help use: slot add -h');
+        showHelpMsg("Please enter a valid rest service name", "slot add -h")
     }
+}
+
+/**
+ * @param {string} slotJson         JSON object representation for slot.json file
+ * @param {string} slotJsonFile     Full path where the slot.json file must be write
+ * @param {string} property         Property name to be write
+ * @param {function} callback
+ */
+function setConfigProperty(slotJson, slotJsonFile, property, callback) {
+
+    pretty.doing();
+    pretty.doing('Setting %s property', property);
+
+    // Update the slot.json file
+    fs.writeFile(slotJsonFile, JSON.stringify(slotJson, null, 4), function (err) {
+
+        callback(err);
+    });
+}
+
+function showHelpMsg(message, command) {
+    pretty.alert();
+    pretty.alert(message);
+    pretty.alert("   To see help use: %s", command);
+    pretty.alert();
 }
 
 module.exports.addPage = addPage;
 module.exports.addFragment = addFragment;
 module.exports.addRestService = addRestService;
+module.exports.setConfigProperty = setConfigProperty;
+module.exports.showHelpMsg = showHelpMsg;
