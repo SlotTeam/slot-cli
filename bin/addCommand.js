@@ -20,6 +20,24 @@ function addCommand(options) {
             //
             var pathToResources = path.join(path.join(__dirname, ".."), "resources");
 
+            //if (options.page) {
+            //    //slot add -p pageName -a att1,attr2,attr3@frag1,attr4
+            //
+            //    pretty.inform("We are on options.page[%s]", options.page);
+            //    pretty.inform("We are on options.attributes[%s]", options.attributes);
+            //
+            //    for(attr in (attributes = options.attributes.split(','))) {
+            //
+            //        var attrName = attributes[attr].split('@'),
+            //            cloneFromFragmentId = attrName.length == 2 ? attrName[1] : "";
+            //
+            //        attrName = attrName[0];
+            //
+            //        pretty.inform("Adding attribute#%s [%s] %s", attr, attrName, (cloneFromFragmentId ? "cloned from fragmentId[" + cloneFromFragmentId + "]" : ""));
+            //    }
+            //
+            //}
+            //else
             if (options.fragment) {
                 cliActions.addFragment(pathToResources, process.cwd(), options.fragment, slotJson, slotJsonFile, function(err) {
                     if(err)
@@ -44,15 +62,41 @@ function addCommand(options) {
                         pretty.done("Page '%s' was created", options.page);
                 });
             }
+            else if (options.attributes) {
+                //slot add -a att1,attr2,attr3@frag1,attrA --toPage page1
+                //slot add -a att1,attr2,attr3@clone/frag1,attrA --toPage page1
+                //slot add -a att1,attr2,attr3@frag1,attr4@clone/frag1,attrA --toPage page1
+                //slot add -a att1,attr2,attr3@frag3,attr4@clone/frag4,attrA --toPage page1
+
+                pretty.inform("We are on options.attributes[%s]", options.attributes);
+                pretty.inform("We are on options.toPage[%s]", options.toPage);
+
+                for(attr in (attributes = options.attributes.split(','))) {
+
+                    var attribute = attributes[attr].split('@'),
+                        attrName = attribute[0],
+                        usingFragmentId = attribute.length == 2 ? attribute[1] : "",
+                        cloningFragmentId = "";
+                        ;
+
+                    if(usingFragmentId.startsWith('clone/')) {
+                        usingFragmentId = usingFragmentId.split('clone/');
+                        cloningFragmentId = usingFragmentId[1];
+                        usingFragmentId = "";
+                    }
+
+                    pretty.inform("Adding attribute#%s [%s] %s", attr, attrName, (usingFragmentId ? "using fragmentId[" + usingFragmentId + "]" : ((cloningFragmentId ? "cloning fragmentId[" + cloningFragmentId + "]" : ""))));
+                }
+
+            }
             else {
-                pretty.alert();
-                pretty.alert("Please enter a valid command");
-                pretty.alert("   To see help use: slot add -h");
+                cliActions.showHelpMsg("Please enter a valid command", "slot add -h")
             }
         }
         , function (exists) {
             pretty.alert();
             pretty.alert("It appears that you are not located on a project root folder, the 'slot.json' file was not found on current directory.");
+            pretty.alert();
         }
     );
 }

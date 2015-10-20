@@ -96,11 +96,18 @@ program.command('restart')
     }
 );
 
+/**
+ * Add command
+ */
 program.command('add')
     .description('Adds a new object to current slot project')
     .option("-p, --page [page]", "Which page name to use", null)
     .option("-f, --fragment [fragment]", "Which fragment name to use", null)
     .option("-r, --rest [rest]", "Which rest service name to use", null)
+    //.option("-a, --attributes [attributes]", "Add a comma separated attributes list. It adds attributes to pages when using -p/--page, or adds attributes to fragments when using -f/--fragment, ", null)
+    .option("-a, --attributes [attributes]", "Add a comma separated attributes list. It adds attributes to pages when using --toPage, or adds attributes to fragments when using --toFragment, ", null)
+    .option("--toPage [toPage]", "The page where attributes are going to be added, ", null)
+    .option("--toFragment [toFragment]", "The fragment where attributes are going to be added, ", null)
     .action(function (options) {
 
         addCommand(options);

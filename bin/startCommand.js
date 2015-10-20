@@ -88,9 +88,7 @@ function startCommand(options) {
                 pretty.alert();
             }
             else {
-                pretty.alert();
-                pretty.alert("Please enter a valid command");
-                pretty.alert("   To see help use: slot start -h");
+                cliActions.showHelpMsg("Please enter a valid command", "slot start -h")
             }
         }
         , function (exists) {
