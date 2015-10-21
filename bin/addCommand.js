@@ -68,8 +68,7 @@ function addCommand(options) {
                 //slot add -a att1,attr2,attr3@frag1,attr4@clone/frag1,attrA --toPage page1
                 //slot add -a att1,attr2,attr3@frag3,attr4@clone/frag4,attrA --toPage page1
 
-                pretty.inform("We are on options.attributes[%s]", options.attributes);
-                pretty.inform("We are on options.toPage[%s]", options.toPage);
+                pretty.inform("Adding attributes[%s] to %s", options.attributes, (options.toPage ? options.toPage+" page" : options.toFragment+" fragment"));
 
                 for(attr in (attributes = options.attributes.split(','))) {
 
@@ -79,15 +78,31 @@ function addCommand(options) {
                         cloningFragmentId = "";
                         ;
 
-                    if(usingFragmentId.startsWith('clone/')) {
+                    if(!usingFragmentId) {
+                        /**
+                         * Add attribute whit out any reference to other fragments
+                         */
+                        pretty.inform("Adding attribute#%s [%s]", attr, attrName);
+                    }
+                    else if(usingFragmentId.startsWith('clone/')) {
+                        /**
+                         * Add attribute cloning a referenced fragment
+                         */
                         usingFragmentId = usingFragmentId.split('clone/');
                         cloningFragmentId = usingFragmentId[1];
                         usingFragmentId = "";
+
+                        pretty.inform("Adding attribute#%s [%s] cloning fragmentId[%s]", attr, attrName, cloningFragmentId);
+
                     }
-
-                    pretty.inform("Adding attribute#%s [%s] %s", attr, attrName, (usingFragmentId ? "using fragmentId[" + usingFragmentId + "]" : ((cloningFragmentId ? "cloning fragmentId[" + cloningFragmentId + "]" : ""))));
+                    else {
+                        /**
+                         * Add attribute referencing a fragment
+                         */
+                        pretty.inform("Adding attribute#%s [%s] using fragmentId[%s]", attr, attrName, usingFragmentId);
+                    }
+                    //pretty.inform("Adding attribute#%s [%s] %s", attr, attrName, (usingFragmentId ? "using fragmentId[" + usingFragmentId + "]" : ((cloningFragmentId ? "cloning fragmentId[" + cloningFragmentId + "]" : ""))));
                 }
-
             }
             else {
                 cliActions.showHelpMsg("Please enter a valid command", "slot add -h")
