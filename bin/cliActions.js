@@ -136,6 +136,11 @@ function addRestService(pathToResources, projectFolder, rest, slotJson, callback
     if (rest.trim() != '') {
         pretty.doing("Adding new rest service '%s'", rest);
 
+        /**
+         * TODO:
+         *  1.  Validate the fragmentId has not been added to ("slot.json file").fragments
+         */
+
         var folder = rest.split('/').pop(); // Using '/' because we are talking about web contexts
         folder = rest.replace(folder, '');
 
