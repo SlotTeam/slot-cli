@@ -46,11 +46,6 @@ function addCommand(options) {
                 });
             }
             else if (options.attributes) {
-                //slot add -a att1,attr2,attr3@frag1,attrA --toPage page1
-                //slot add -a att1,attr2,attr3@clone/frag1,attrA --toPage page1
-                //slot add -a att1,attr2,attr3@frag1,attr4@clone/frag1,attrA --toPage page1
-                //slot add -a att1,attr2,attr3@frag3,attr4@clone/frag4,attrA --toPage page1
-
                 //pretty.doing("Adding attributes '%s' to %s", options.attributes, (options.toPage ? options.toPage+" page" : options.toFragment+" fragment"));
 
                 addAttrsActions.handleAttributes(options, slotJson, slotJsonFile, function(err, output){
@@ -58,91 +53,14 @@ function addCommand(options) {
                      * TODO:
                      *  1.  Implement actions after callback is back..!
                      */
+                    if( err ) {
+                        // One of the iterations produced an error, the processing will now stop.
+                        //pretty.failed('Building pages has failed');
+                        pretty.failed(err);
+                    } else {
+                        pretty.done('All attributes have been added');
+                    }
                 })
-
-                //for(attr in (attributes = options.attributes.split(','))) {
-                //
-                //    var attribute = attributes[attr].split('@'),
-                //        attrName = attribute[0],
-                //        usingFragmentId = attribute.length == 2 ? attribute[1] : "",
-                //        cloningFragmentId = "";
-                //        ;
-                //
-                //    if(!usingFragmentId) {
-                //        /**
-                //         * Add attribute whit out any reference to other fragments
-                //         */
-                //        pretty.inform("%s: Attribute '%s' added as single attribute", attr, attrName);
-                //    }
-                //    else if(usingFragmentId.startsWith('clone/')) {
-                //        /**
-                //         * Add attribute cloning a referenced fragment
-                //         */
-                //        usingFragmentId = usingFragmentId.split('clone/');
-                //        cloningFragmentId = usingFragmentId[1];
-                //        usingFragmentId = "";
-                //
-                //        pretty.inform("%s: Attribute '%s' will be cloned from fragmentId '%s'", attr, attrName, cloningFragmentId);
-                //
-                //        // Validate fragmentId to add already exists on ("slot.json file").fragments
-                //        if(slotJson.fragments[cloningFragmentId]) {
-                //
-                //        }
-                //        else {
-                //            pretty.failed("fragmentId '%s' does not exists", cloningFragmentId);
-                //        }
-                //    }
-                //    else {
-                //        /**
-                //         * Add attribute referencing a fragment
-                //         */
-                //        pretty.inform("%s: Attribute '%s' is a typeOf fragmentId '%s'", attr, attrName, usingFragmentId);
-                //
-                //        // Validate fragmentId to add already exists on ("slot.json file").fragments
-                //        if(slotJson.fragments[usingFragmentId]) {
-                //
-                //            var pageMetaDataFile = path.join(slotJsonFile, slotJson.framework.metaData, slotJson.fragments[usingFragmentId], '.json');
-                //
-                //            pretty.inform(".. '%s' added to metadata file '%s'.json", attrName, slotJson.fragments[usingFragmentId]);
-                //            pretty.inform(".. '%s' added to html file '%s'.html", attrName, slotJson.fragments[usingFragmentId]);
-                //
-                //            /**
-                //             * TODO:
-                //             *  1.  Load metadata Page file and add the new fragment into file:
-                //             *          "pageNavbar": {
-                //             *              "fragmentID":"frgNavbar"
-                //             *          },
-                //             *
-                //             *          Or
-                //             *
-                //                     "iotCards":{
-                //                        "fragmentID":"iotCard",
-                //                        "bind":[
-                //                            {"iotId":"WAL-000001",
-                //                              "address":"Store 1025 Av.",
-                //                              "inmap":"Aisle 3, bin 32",
-                //                              "aliveTime":"10.5 hours alive",
-                //                              "adsSend":"1050 Ads send"
-                //                             },
-                //                            {"iotId":"WAL-000002",
-                //                              "address":"Store 1025 Av.",
-                //                              "inmap":"Aisle 3, bin 32",
-                //                              "aliveTime":"8.5 hours alive",
-                //                              "adsSend":"1235 Ads send"
-                //                             }
-                //                        ]
-                //                    }
-                //             *
-                //             *  2.  Load html Page file and add the new fragment into file:
-                //             *      {@attrName@}
-                //             */
-                //
-                //        }
-                //        else {
-                //            pretty.failed("fragmentId '%s' does not exists", usingFragmentId);
-                //        }
-                //    }
-                //}
             }
             else {
                 cliActions.showHelpMsg("Please enter a valid command", "slot add -h")
