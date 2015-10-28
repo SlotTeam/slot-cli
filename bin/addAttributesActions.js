@@ -97,49 +97,46 @@ function addSingleAttribute(attr, attrName, options, slotJson, callback) {
 
 function addFragmentAttribute(attr, attrName, usingFragmentId, options, slotJson, callback) {
 
-    //pretty.inform("%s: Attribute '%s' will be added as single attribute", attr, attrName);
     pretty.inform("%s: Attribute '%s' is a typeOf fragmentId '%s'", attr, attrName, usingFragmentId);
 
     var metaDataFilePath = path.join(process.cwd(), slotJson.framework.metaData, (options.toPage ? options.toPage : options.toFragment) + '.json'),
         metaDataFile = require(metaDataFilePath);
 
     if(metaDataFile.binds[attrName]) {
-        callback && callback(util.format("attribute '%s' already exists on '%s'", attrName, (options.toPage ? options.toPage + " page" : options.toFragment + " fragment")));
+        callback && callback(util.format("attribute '%s' already exists on '%s' %s", attrName, (options.toPage ? options.toPage : options.toFragment), (options.toPage ? "page" : "fragment")));
     }
     else {
         // Validate fragmentId to add already exists on ("slot.json file").fragments
         if(slotJson.fragments[usingFragmentId]) {
 
-            //var pageMetaDataFile = path.join(slotJsonFile, slotJson.framework.metaData, slotJson.fragments[usingFragmentId], '.json');
-            //
-            //pretty.inform("   '%s' added to metadata file '%s'.json", attrName, slotJson.fragments[usingFragmentId]);
-            //pretty.inform("   '%s' added to html file '%s'.html", attrName, slotJson.fragments[usingFragmentId]);
-
-            /**
-             * TODO:
-             *  1.  Look the referenced fragment.json file
-             */
+            // Load metadata file for referenced fragment
             var referencedMetaDataFilePath = path.join(process.cwd(), slotJson.framework.metaData, slotJson.fragments[usingFragmentId] + '.json'),
                 referencedMetaDataFile = require(referencedMetaDataFilePath);
 
-            pretty.inform(" usingFragmentId[%s] referencedMetaDataFilePath[%s]", usingFragmentId, referencedMetaDataFilePath);
+            // Verify how many instances must be added
+            if(options.repeat) {
+                // Build metadata file adding many instances
+                metaDataFile.binds[attrName] = {
+                    fragmentID : usingFragmentId,
+                    bind : []
+                }
 
-            //delete referencedMetaDataFile.binds['fragmentID'];
-            pretty.inform("referencedMetaDataFile %s", JSON.stringify(referencedMetaDataFile.binds, null, 4));
+                delete referencedMetaDataFile.binds['fragmentID'];
 
+                for(var index=0; index<options.repeat; index++) {
+                    metaDataFile.binds[attrName].bind.push(referencedMetaDataFile.binds);
+                }
+            }
+            else {
+                //Set the referenced FragmentId
+                referencedMetaDataFile.binds['fragmentID'] = usingFragmentId;
 
-            //Set the referenced FragmentId
-            referencedMetaDataFile.binds['fragmentID'] = usingFragmentId+"xx";
-
-            //if(options)
-            // Add dummy value for added attribute
-            metaDataFile.binds[attrName] = referencedMetaDataFile.binds;
+                // Add dummy value for added attribute
+                metaDataFile.binds[attrName] = referencedMetaDataFile.binds;
+            }
 
             // Delete 'someAttribute' test attribute if exists
             metaDataFile.binds['someAttribute'] && delete metaDataFile.binds['someAttribute']
-
-            pretty.inform("metaDataFile %s", JSON.stringify(metaDataFile, null, 4));
-            //callback && callback(err);
 
             // Update the metaData file
             fs.writeFile(metaDataFilePath, JSON.stringify(metaDataFile, null, 4), function (err) {
