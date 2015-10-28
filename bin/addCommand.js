@@ -46,16 +46,10 @@ function addCommand(options) {
                 });
             }
             else if (options.attributes) {
-                //pretty.doing("Adding attributes '%s' to %s", options.attributes, (options.toPage ? options.toPage+" page" : options.toFragment+" fragment"));
-
                 addAttrsActions.handleAttributes(options, slotJson, slotJsonFile, function(err, output){
-                    /**
-                     * TODO:
-                     *  1.  Implement actions after callback is back..!
-                     */
+
                     if( err ) {
                         // One of the iterations produced an error, the processing will now stop.
-                        //pretty.failed('Building pages has failed');
                         pretty.failed(err);
                     } else {
                         pretty.done('All attributes have been added');

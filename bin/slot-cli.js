@@ -108,6 +108,7 @@ program.command('add')
     .option("-a, --attributes [attributes]", "Add a comma separated attributes list. It adds attributes to pages when using --toPage, or adds attributes to fragments when using --toFragment, ", null)
     .option("--toPage [toPage]", "The page where attributes are going to be added, ", null)
     .option("--toFragment [toFragment]", "The fragment where attributes are going to be added, ", null)
+    .option("--repeat [repeat]", "How many times a fragment will be added, ", null)
     .action(function (options) {
 
         addCommand(options);
