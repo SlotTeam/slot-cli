@@ -71,9 +71,14 @@ function addSingleAttribute(attr, attrName, options, slotJson, callback) {
                 updateResource(htmlDataFile,
                     function(content, afterUpdate) {    // <= onUpdate callback function
 
-                        // Modify content, adding a attribute in this case
                         content = content.replace("{@someAttribute@}", "<!--append here-->")
-                        content = content.replace("<!--append here-->", "{@" +attrName+ "@}" + "\r\n<!--append here-->")
+
+                        // Set 'append here' area at the end of the content
+                        if(content.indexOf("<!--append here-->") < 0)
+                            content = content + "\r\n<!--append here-->";
+
+                        // Modify content, adding a attribute in this case
+                        content = content.replace("<!--append here-->", "{@" + attrName + "@}" + "\r\n<!--append here-->")
 
                         // Call back to update content on file system
                         afterUpdate(content, htmlDataFile);
@@ -113,13 +118,18 @@ function addFragmentAttribute(attr, attrName, usingFragmentId, options, slotJson
             var referencedMetaDataFilePath = path.join(process.cwd(), slotJson.framework.metaData, slotJson.fragments[usingFragmentId] + '.json'),
                 referencedMetaDataFile = require(referencedMetaDataFilePath);
 
-            // Verify how many instances must be added
+            // Instance a new attribute referencing a fragmentId
+            metaDataFile.binds[attrName] = {
+                fragmentID : usingFragmentId
+            };
+
             if(options.repeat) {
-                // Build metadata file adding many instances
-                metaDataFile.binds[attrName] = {
-                    fragmentID : usingFragmentId,
-                    bind : []
-                }
+                //// Build metadata file adding many instances
+                //metaDataFile.binds[attrName] = {
+                //    fragmentID : usingFragmentId,
+                //    bind : []
+                //}
+                metaDataFile.binds[attrName]['bind'] = [];
 
                 delete referencedMetaDataFile.binds['fragmentID'];
 
@@ -127,13 +137,16 @@ function addFragmentAttribute(attr, attrName, usingFragmentId, options, slotJson
                     metaDataFile.binds[attrName].bind.push(referencedMetaDataFile.binds);
                 }
             }
-            else {
-                //Set the referenced FragmentId
-                referencedMetaDataFile.binds['fragmentID'] = usingFragmentId;
-
-                // Add dummy value for added attribute
-                metaDataFile.binds[attrName] = referencedMetaDataFile.binds;
-            }
+            //else {
+            //    //Set the referenced FragmentId
+            //    //referencedMetaDataFile.binds['fragmentID'] = usingFragmentId;
+            //
+            //    // Add dummy value for added attribute
+            //    //metaDataFile.binds[attrName] = referencedMetaDataFile.binds;
+            //    metaDataFile.binds[attrName] = {
+            //        fragmentID : usingFragmentId
+            //    };
+            //}
 
             // Delete 'someAttribute' test attribute if exists
             metaDataFile.binds['someAttribute'] && delete metaDataFile.binds['someAttribute']
@@ -150,9 +163,14 @@ function addFragmentAttribute(attr, attrName, usingFragmentId, options, slotJson
                     updateResource(htmlDataFile,
                         function(content, afterUpdate) {    // <= onUpdate callback function
 
-                            // Modify content, adding a attribute in this case
                             content = content.replace("{@someAttribute@}", "<!--append here-->")
-                            content = content.replace("<!--append here-->", "{@" +attrName+ "@}" + "\r\n<!--append here-->")
+
+                            // Set 'append here' area at the end of the content
+                            if(content.indexOf("<!--append here-->") < 0)
+                                content = content + "\r\n<!--append here-->";
+
+                            // Modify content, adding a attribute in this case
+                            content = content.replace("<!--append here-->", "{@" + attrName + "@}" + "\r\n<!--append here-->")
 
                             // Call back to update content on file system
                             afterUpdate(content, htmlDataFile);
@@ -173,7 +191,6 @@ function addFragmentAttribute(attr, attrName, usingFragmentId, options, slotJson
             });
         }
         else {
-            //pretty.failed("fragmentId '%s' does not exists", usingFragmentId);
             callback && callback(util.format("fragmentId '%s' does not exists on slot.json file", usingFragmentId));
         }
     }
@@ -227,7 +244,7 @@ function handleAttributes (options, slotJson, slotJsonFile, callback) {
                 }
             }, 75);
         }
-        , function(err){
+        , function(err) {
 
             callback(err);
         }
