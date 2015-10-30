@@ -1,6 +1,4 @@
 {
-    "slots": {
-    },
     "binds": {
         "pageTitle":"{@pageTitle@}",
         "welcomeMsg":"{@welcomeMsg@}"
