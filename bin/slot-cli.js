@@ -20,10 +20,12 @@ var program = require('commander'),
     stopCommand = require('./stopCommand'),
     exportCommand = require('./exportCommand'),
     pretty = require('./prettyMessage'),
-    pkg = require('../package.json');
+    pkg = require('../package.json'),
+    pkgFramework = require('../node_modules/slot-framework/package.json');
 
 // Get version number from package.json file
 program.version(pkg.version);
+program.framework = {version : pkgFramework.version};
 
 /**
  * TODO:
@@ -36,6 +38,18 @@ program.command('*')
         pretty.alert("Enter a Valid command");
         pretty.alert("   To see help use: slot -h");
     });
+
+/**
+ * Start command
+ */
+program.command('framework')
+    .description('Shows version details for each component')
+    .option("-V, --version", "Shows the actual framework used on the command line")
+    .action(function (options) {
+
+            pretty.alert('Version: %s', program.framework.version);
+        }
+    );
 
 program.command('create [project]')
     .description('Creates a new project on folder [name]')  //.option("-t, --theme [theme_id]", "Which theme_id to use in the project. It will install a predefined theme based on HTML5 frameworks like Bootstrap, Zurb, Kube.", null)
